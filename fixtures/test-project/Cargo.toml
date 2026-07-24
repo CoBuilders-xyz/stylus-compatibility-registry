@@ -1,0 +1,18 @@
+[package]
+name = "test-stylus-contract"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Compatible: no_std, no floats, no async
+tiny-keccak = "2.0"
+hex = { version = "0.4", default-features = false }
+
+# Incompatible: requires std
+tokio = { version = "1", features = ["full"] }
+
+# Incompatible: uses floats
+nalgebra = "0.33"
+
+# Compatible with configuration
+serde = { version = "1", default-features = false, features = ["derive"] }

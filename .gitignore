@@ -1,0 +1,27 @@
+# Build outputs
+/target/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+
+# Database (future: SQLite registry)
+*.db
+*.sqlite
+
+# Misc
+*.log
