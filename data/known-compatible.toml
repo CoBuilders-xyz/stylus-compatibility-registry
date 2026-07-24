@@ -1,0 +1,195 @@
+# Known Stylus-Compatible Crates
+#
+# These crates have been verified to work with Arbitrum Stylus contracts.
+# Each entry documents the compatibility status and any special configuration
+# needed (e.g., disabling default features).
+#
+# To add a crate: copy a [[crate]] block, fill in the fields, and open a PR.
+# See CONTRIBUTING.md for guidelines.
+
+# --- Stylus SDK & Ecosystem ---
+
+[[crate]]
+name = "stylus-sdk"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Official Stylus SDK — the foundation for all Stylus contracts"
+
+[[crate]]
+name = "alloy-primitives"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Ethereum primitive types (Address, U256, B256). Use default-features = false"
+
+[[crate]]
+name = "alloy-sol-types"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Solidity type encoding/decoding. Use default-features = false"
+
+# --- Cryptography ---
+
+[[crate]]
+name = "tiny-keccak"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Pure Rust keccak256 — recommended by Arbitrum docs"
+
+[[crate]]
+name = "sha2"
+requires_std = false
+has_float = false
+has_async = false
+notes = "SHA-256/SHA-512. Use default-features = false"
+
+[[crate]]
+name = "sha3"
+requires_std = false
+has_float = false
+has_async = false
+notes = "SHA-3/Keccak. Use default-features = false"
+
+[[crate]]
+name = "k256"
+requires_std = false
+has_float = false
+has_async = false
+notes = "secp256k1 curve operations. Use default-features = false"
+
+[[crate]]
+name = "p256"
+requires_std = false
+has_float = false
+has_async = false
+notes = "NIST P-256 curve. Use default-features = false"
+
+# --- Serialization ---
+
+[[crate]]
+name = "serde"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Use default-features = false, features = [\"derive\"]"
+
+[[crate]]
+name = "serde-json-core"
+requires_std = false
+has_float = false
+has_async = false
+notes = "no_std JSON parser — alternative to serde_json"
+
+[[crate]]
+name = "borsh"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Binary serialization. Use default-features = false"
+
+[[crate]]
+name = "ciborium"
+requires_std = false
+has_float = false
+has_async = false
+notes = "CBOR encoding/decoding for no_std"
+
+# --- Math & Data Structures ---
+
+[[crate]]
+name = "ruint"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Fixed-size unsigned integers (U256, etc.)"
+
+[[crate]]
+name = "fixed"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Fixed-point arithmetic — no floats needed"
+
+[[crate]]
+name = "uint"
+requires_std = false
+has_float = false
+has_async = false
+notes = "256-bit and other large integers"
+
+[[crate]]
+name = "arrayvec"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Fixed-capacity Vec alternative for no_std"
+
+[[crate]]
+name = "heapless"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Static-friendly data structures (Vec, String, Map) without alloc"
+
+[[crate]]
+name = "smallvec"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Stack-allocated small vectors. Use default-features = false"
+
+# --- Encoding ---
+
+[[crate]]
+name = "hex"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Hex encoding/decoding. Use default-features = false"
+
+[[crate]]
+name = "base64"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Base64 encoding. Use default-features = false"
+
+[[crate]]
+name = "bs58"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Base58 encoding. Use default-features = false"
+
+# --- Utilities ---
+
+[[crate]]
+name = "bytes"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Byte buffer utilities. Use default-features = false"
+
+[[crate]]
+name = "bitflags"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Type-safe bitflags"
+
+[[crate]]
+name = "cfg-if"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Conditional compilation helper — zero-cost"
+
+[[crate]]
+name = "static_assertions"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Compile-time assertions — zero runtime cost"

@@ -1,0 +1,199 @@
+# Known Stylus-Incompatible Crates
+#
+# These crates cannot be used in Stylus contracts due to std requirements,
+# floating-point usage, async runtimes, or OS-level dependencies.
+#
+# Each entry includes the reason for incompatibility and a suggested alternative
+# where one exists.
+#
+# To update: open a PR with evidence (e.g., link to the crate's Cargo.toml
+# showing the std dependency, or a compilation error log).
+
+# --- Async Runtimes ---
+
+[[crate]]
+name = "tokio"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Async runtime — requires std, threads, I/O polling"
+
+[[crate]]
+name = "async-std"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Async runtime — requires std"
+
+[[crate]]
+name = "smol"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Async runtime — requires std"
+
+# --- Networking ---
+
+[[crate]]
+name = "reqwest"
+requires_std = true
+has_float = false
+has_async = true
+alternative = "N/A — no HTTP client is possible in WASM contracts"
+notes = "HTTP client — requires networking, TLS, async"
+
+[[crate]]
+name = "hyper"
+requires_std = true
+has_float = false
+has_async = true
+notes = "HTTP library — requires std, tokio"
+
+# --- Serialization (std-only) ---
+
+[[crate]]
+name = "serde_json"
+requires_std = true
+has_float = true
+has_async = false
+alternative = "serde-json-core"
+notes = "Uses std::io for formatting. Use serde-json-core for no_std JSON"
+
+[[crate]]
+name = "serde_yaml"
+requires_std = true
+has_float = false
+has_async = false
+notes = "YAML parsing requires std"
+
+[[crate]]
+name = "toml"
+requires_std = true
+has_float = false
+has_async = false
+notes = "TOML parsing requires std"
+
+# --- Database ---
+
+[[crate]]
+name = "diesel"
+requires_std = true
+has_float = false
+has_async = false
+notes = "ORM — requires std, libc, database drivers"
+
+[[crate]]
+name = "sqlx"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Async SQL toolkit — requires std, networking"
+
+[[crate]]
+name = "rusqlite"
+requires_std = true
+has_float = false
+has_async = false
+notes = "SQLite bindings — requires libc, filesystem"
+
+# --- OS-Dependent ---
+
+[[crate]]
+name = "libc"
+requires_std = true
+has_float = false
+has_async = false
+notes = "Raw FFI bindings to platform C library — no WASM equivalent"
+
+[[crate]]
+name = "nix"
+requires_std = true
+has_float = false
+has_async = false
+notes = "Unix API bindings — requires libc"
+
+[[crate]]
+name = "mio"
+requires_std = true
+has_float = false
+has_async = false
+notes = "I/O event loop — requires OS-level polling (epoll/kqueue)"
+
+[[crate]]
+name = "native-tls"
+requires_std = true
+has_float = false
+has_async = false
+notes = "TLS via OS libraries — no WASM equivalent"
+
+[[crate]]
+name = "openssl"
+requires_std = true
+has_float = false
+has_async = false
+alternative = "Use pure-Rust crypto crates (sha2, k256, etc.)"
+notes = "OpenSSL bindings — requires libc, system libraries"
+
+# --- Floating-Point Heavy ---
+
+[[crate]]
+name = "num"
+requires_std = false
+has_float = true
+has_async = false
+alternative = "ruint, fixed, uint"
+notes = "Default features include float types — Stylus disallows f32/f64"
+
+[[crate]]
+name = "nalgebra"
+requires_std = false
+has_float = true
+has_async = false
+alternative = "fixed (for fixed-point arithmetic)"
+notes = "Linear algebra library — heavily uses f32/f64"
+
+[[crate]]
+name = "rand"
+requires_std = true
+has_float = true
+has_async = false
+notes = "RNG — uses floats for distributions, requires OS entropy source"
+
+# --- Web Frameworks ---
+
+[[crate]]
+name = "actix-web"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Web framework — requires networking, async, OS APIs"
+
+[[crate]]
+name = "rocket"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Web framework — requires networking, async, OS APIs"
+
+[[crate]]
+name = "axum"
+requires_std = true
+has_float = false
+has_async = true
+notes = "Web framework — requires tokio, hyper, networking"
+
+# --- Logging (std-only) ---
+
+[[crate]]
+name = "env_logger"
+requires_std = true
+has_float = false
+has_async = false
+notes = "Requires std::env and std::io"
+
+[[crate]]
+name = "tracing-subscriber"
+requires_std = true
+has_float = false
+has_async = false
+notes = "Requires std for I/O and threading"
