@@ -260,6 +260,10 @@ impl WasmTargetCheck {
     }
 
     fn run_with_cargo(&self, crate_info: &CrateInfo, cargo: &str) -> CheckResult {
+        if KNOWN_WASM_INCOMPATIBLE.contains(&crate_info.name.as_str()) {
+            return self.blocklist_check(crate_info);
+        }
+
         match compile_check_with_cargo(crate_info, cargo) {
             CompileCheckOutcome::Pass(message) => CheckResult::pass(self.name(), message),
             CompileCheckOutcome::Error(errors) => CheckResult::error(
@@ -296,6 +300,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = WasmTargetCheck.run(&info);
         assert_eq!(result.severity, Severity::Error);
@@ -308,6 +313,7 @@ mod tests {
             version: Some("0.8.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = WasmTargetCheck.run(&info);
         assert_eq!(result.severity, Severity::Pass);
@@ -321,6 +327,7 @@ mod tests {
             version: Some("0.4.3".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let outcome = compile_check(&info);
         assert_eq!(
@@ -337,18 +344,20 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let outcome = compile_check(&info);
         assert!(matches!(outcome, CompileCheckOutcome::Error(_)));
     }
 
     #[test]
-    fn run_falls_back_to_blocklist_when_compilation_unavailable() {
+    fn known_incompatible_crate_short_circuits_compilation() {
         let info = CrateInfo {
             name: "nix".to_string(),
             version: Some("0.27.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = WasmTargetCheck.run_with_cargo(&info, "/nonexistent/cargo");
         assert_eq!(result.severity, Severity::Error);
@@ -362,6 +371,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = WasmTargetCheck.run_with_cargo(&info, "/nonexistent/cargo");
         assert_eq!(result.severity, Severity::Pass);
@@ -375,6 +385,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let outcome = compile_check(&info);
         assert_eq!(outcome, CompileCheckOutcome::Unavailable);
@@ -387,6 +398,7 @@ mod tests {
             version: Some("1.0\"\n[build-dependencies]\nx = \"1\"".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let outcome = compile_check(&info);
         assert_eq!(outcome, CompileCheckOutcome::Unavailable);

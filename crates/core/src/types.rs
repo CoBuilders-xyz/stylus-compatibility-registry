@@ -7,6 +7,7 @@ pub struct CrateInfo {
     pub version: Option<String>,
     pub features: Vec<String>,
     pub default_features: bool,
+    pub is_transitive: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]

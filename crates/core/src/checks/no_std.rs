@@ -82,6 +82,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = NoStdCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Error);
@@ -95,6 +96,7 @@ mod tests {
             version: Some("2.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = NoStdCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Pass);
@@ -107,6 +109,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let entry = KnownCrateEntry {
             name: "serde_json".to_string(),
@@ -128,6 +131,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: false,
+            is_transitive: false,
         };
         let entry = KnownCrateEntry {
             name: "serde".to_string(),

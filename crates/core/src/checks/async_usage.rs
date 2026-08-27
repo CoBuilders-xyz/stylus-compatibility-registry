@@ -54,6 +54,7 @@ mod tests {
             version: Some("1.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = AsyncUsageCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Error);
@@ -66,6 +67,7 @@ mod tests {
             version: None,
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = AsyncUsageCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Pass);

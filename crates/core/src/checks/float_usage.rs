@@ -476,6 +476,7 @@ mod tests {
             version: version.map(str::to_string),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         }
     }
 
