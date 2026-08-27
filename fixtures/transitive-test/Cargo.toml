@@ -6,3 +6,7 @@ edition = "2021"
 [dependencies]
 hex = { version = "0.4", default-features = false }
 fs2 = "0.4"
+transitive-libc = { path = "transitive-libc" }
+
+[target.'cfg(windows)'.dependencies]
+mio = "1"

@@ -351,7 +351,7 @@ mod tests {
     }
 
     #[test]
-    fn run_falls_back_to_blocklist_when_compilation_unavailable() {
+    fn known_incompatible_crate_short_circuits_compilation() {
         let info = CrateInfo {
             name: "nix".to_string(),
             version: Some("0.27.0".to_string()),

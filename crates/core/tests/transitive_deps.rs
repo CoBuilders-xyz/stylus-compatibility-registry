@@ -11,8 +11,8 @@ fn fixtures_dir() -> PathBuf {
 #[test]
 fn analyze_with_transitive_finds_incompatible_transitive_dep() {
     let manifest = fixtures_dir().join("transitive-test/Cargo.toml");
-    let direct = stylus_compat_core::analyze_project(&manifest, None, false).unwrap();
-    let full = stylus_compat_core::analyze_project(&manifest, None, true).unwrap();
+    let direct = stylus_compat_core::analyze_project(&manifest, None).unwrap();
+    let full = stylus_compat_core::analyze_project_with_transitive(&manifest, None, true).unwrap();
     assert!(full.crate_reports.len() > direct.crate_reports.len());
     let libc = full
         .crate_reports
@@ -24,6 +24,14 @@ fn analyze_with_transitive_finds_incompatible_transitive_dep() {
         .results
         .iter()
         .any(|r| r.severity == Severity::Error && r.check_name == "wasm_target"));
+    assert!(full
+        .crate_reports
+        .iter()
+        .all(|report| report.crate_info.name != "mio"));
+    assert!(full
+        .crate_reports
+        .iter()
+        .all(|report| report.crate_info.name != "winapi"));
     assert!(direct
         .crate_reports
         .iter()

@@ -20,6 +20,16 @@ pub enum AnalyzeError {
     Registry(#[from] registry::RegistryError),
 }
 
+/// Analyzes a project's direct dependencies against Stylus compatibility constraints.
+///
+/// Use [`analyze_project_with_transitive`] to optionally include the full dependency tree.
+pub fn analyze_project(
+    manifest_path: &Path,
+    data_dir: Option<&Path>,
+) -> Result<ProjectReport, AnalyzeError> {
+    analyze_project_with_transitive(manifest_path, data_dir, false)
+}
+
 /// Analyzes a project's Cargo.toml against Stylus compatibility constraints.
 ///
 /// This is the main entry point for the library. It:
@@ -27,7 +37,7 @@ pub enum AnalyzeError {
 /// 2. Loads the known-crates registry (if a data directory is provided)
 /// 3. Runs all compatibility checks on each dependency
 /// 4. Computes per-crate and overall scores
-pub fn analyze_project(
+pub fn analyze_project_with_transitive(
     manifest_path: &Path,
     data_dir: Option<&Path>,
     include_transitive: bool,

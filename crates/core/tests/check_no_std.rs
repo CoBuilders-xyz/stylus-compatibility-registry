@@ -24,7 +24,7 @@ fn analyze_fixture_project_detects_incompatible_deps() {
     let manifest = fixtures_dir().join("test-project/Cargo.toml");
     let data = data_dir();
 
-    let report = stylus_compat_core::analyze_project(&manifest, Some(&data), false).unwrap();
+    let report = stylus_compat_core::analyze_project(&manifest, Some(&data)).unwrap();
 
     assert!(
         report.error_count > 0,
@@ -50,7 +50,7 @@ fn analyze_fixture_project_passes_compatible_deps() {
     let manifest = fixtures_dir().join("test-project/Cargo.toml");
     let data = data_dir();
 
-    let report = stylus_compat_core::analyze_project(&manifest, Some(&data), false).unwrap();
+    let report = stylus_compat_core::analyze_project(&manifest, Some(&data)).unwrap();
 
     let serde_report = report
         .crate_reports
@@ -76,7 +76,7 @@ fn analyze_fixture_detects_float_warning() {
     let manifest = fixtures_dir().join("test-project/Cargo.toml");
     let data = data_dir();
 
-    let report = stylus_compat_core::analyze_project(&manifest, Some(&data), false).unwrap();
+    let report = stylus_compat_core::analyze_project(&manifest, Some(&data)).unwrap();
 
     let nalgebra_report = report
         .crate_reports
@@ -100,7 +100,7 @@ fn strict_mode_would_fail_with_errors() {
     let manifest = fixtures_dir().join("test-project/Cargo.toml");
     let data = data_dir();
 
-    let report = stylus_compat_core::analyze_project(&manifest, Some(&data), false).unwrap();
+    let report = stylus_compat_core::analyze_project(&manifest, Some(&data)).unwrap();
 
     assert!(
         report.error_count > 0,

@@ -18,7 +18,7 @@ pub struct CheckDepsArgs {
 }
 
 pub fn run(args: CheckDepsArgs) -> Result<(), Box<dyn std::error::Error>> {
-    let report = stylus_compat_core::analyze_project(
+    let report = stylus_compat_core::analyze_project_with_transitive(
         &args.manifest,
         args.data_dir.as_deref(),
         args.include_transitive,

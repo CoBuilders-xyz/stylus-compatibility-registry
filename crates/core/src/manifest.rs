@@ -43,18 +43,18 @@ pub fn parse_dependencies(manifest_path: &Path) -> Result<Vec<CrateInfo>, Manife
 }
 
 pub fn resolve_full_tree(manifest_path: &Path) -> Result<Vec<CrateInfo>, ManifestError> {
-    let metadata = MetadataCommand::new().manifest_path(manifest_path).exec()?;
+    let metadata = MetadataCommand::new()
+        .manifest_path(manifest_path)
+        .other_options(vec![
+            "--filter-platform".to_string(),
+            "wasm32-unknown-unknown".to_string(),
+        ])
+        .exec()?;
     let root = metadata
         .root_package()
         .ok_or_else(|| ManifestError::NoRootPackage {
             path: manifest_path.display().to_string(),
         })?;
-    let direct_names: HashSet<&str> = root
-        .dependencies
-        .iter()
-        .filter(|dep| dep.kind == DependencyKind::Normal)
-        .map(|dep| dep.name.as_str())
-        .collect();
     let resolve = metadata
         .resolve
         .as_ref()
@@ -68,6 +68,12 @@ pub fn resolve_full_tree(manifest_path: &Path) -> Result<Vec<CrateInfo>, Manifes
         .ok_or_else(|| ManifestError::MissingResolve {
             path: manifest_path.display().to_string(),
         })?;
+    let direct_package_ids: HashSet<PackageId> = root_node
+        .deps
+        .iter()
+        .filter(|dep| is_normal_dep(dep))
+        .map(|dep| dep.pkg.clone())
+        .collect();
     let mut package_ids = collect_reachable_packages(root_node, &resolve.nodes);
     package_ids.remove(&root.id);
     let mut deps: Vec<CrateInfo> = package_ids
@@ -79,8 +85,9 @@ pub fn resolve_full_tree(manifest_path: &Path) -> Result<Vec<CrateInfo>, Manifes
                 name: package.name.clone(),
                 version: Some(package.version.to_string()),
                 features: node.map(|n| n.features.clone()).unwrap_or_default(),
-                default_features: true,
-                is_transitive: !direct_names.contains(package.name.as_str()),
+                default_features: node
+                    .is_some_and(|node| node.features.iter().any(|feature| feature == "default")),
+                is_transitive: !direct_package_ids.contains(&package.id),
             })
         })
         .collect();
@@ -190,12 +197,16 @@ mod tests {
     fn resolve_full_tree_marks_transitive_deps() {
         let manifest = fixtures_dir().join("transitive-test/Cargo.toml");
         let full = resolve_full_tree(&manifest).unwrap();
-        assert!(!full.iter().find(|d| d.name == "hex").unwrap().is_transitive);
+        let hex = full.iter().find(|d| d.name == "hex").unwrap();
+        assert!(!hex.is_transitive);
+        assert!(!hex.default_features);
         assert!(
             full.iter()
                 .find(|d| d.name == "libc")
                 .unwrap()
                 .is_transitive
         );
+        assert!(full.iter().all(|dep| dep.name != "mio"));
+        assert!(full.iter().all(|dep| dep.name != "winapi"));
     }
 }
