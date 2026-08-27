@@ -4,7 +4,11 @@ use std::fs;
 use std::io;
 use std::path::Path;
 use std::process::{Command, Output};
+use std::time::Duration;
 use tempfile::TempDir;
+use wait_timeout::ChildExt;
+
+const CARGO_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Checks whether a crate compiles for the `wasm32-unknown-unknown` target.
 ///
@@ -35,6 +39,42 @@ pub enum CompileCheckOutcome {
 
 fn cargo_bin() -> String {
     std::env::var("STYLUS_COMPAT_CARGO").unwrap_or_else(|_| "cargo".to_string())
+}
+
+fn is_valid_crate_name(name: &str) -> bool {
+    !name.is_empty()
+        && name.len() <= 64
+        && name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+}
+
+fn is_valid_version(version: &str) -> bool {
+    !version.is_empty()
+        && version.len() <= 64
+        && version
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '-' || c == '+')
+}
+
+fn validate_crate_info(crate_info: &CrateInfo) -> Result<(), &'static str> {
+    if !is_valid_crate_name(&crate_info.name) {
+        return Err("invalid crate name");
+    }
+    if let Some(version) = &crate_info.version {
+        if !is_valid_version(version) {
+            return Err("invalid version string");
+        }
+    }
+    for feature in &crate_info.features {
+        if !feature
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '/')
+        {
+            return Err("invalid feature name");
+        }
+    }
+    Ok(())
 }
 
 fn dependency_spec(crate_info: &CrateInfo) -> String {
@@ -99,14 +139,12 @@ fn is_unavailable_output(output: &str) -> bool {
         "connection refused",
         "network unreachable",
         "dns error",
-        "failed to resolve",
-        "couldn't resolve",
+        "failed to resolve host",
+        "couldn't resolve host",
         "failed to get package",
+        "no matching package named",
         "target `wasm32-unknown-unknown` not installed",
         "target 'wasm32-unknown-unknown' not installed",
-        "can't find crate",
-        "could not find `",
-        "no such file or directory (os error 2)",
     ];
 
     UNAVAILABLE_PATTERNS
@@ -159,6 +197,10 @@ pub fn compile_check(crate_info: &CrateInfo) -> CompileCheckOutcome {
 }
 
 pub fn compile_check_with_cargo(crate_info: &CrateInfo, cargo: &str) -> CompileCheckOutcome {
+    if validate_crate_info(crate_info).is_err() {
+        return CompileCheckOutcome::Unavailable;
+    }
+
     let temp_dir = match TempDir::new() {
         Ok(dir) => dir,
         Err(_) => return CompileCheckOutcome::Unavailable,
@@ -168,19 +210,32 @@ pub fn compile_check_with_cargo(crate_info: &CrateInfo, cargo: &str) -> CompileC
         return CompileCheckOutcome::Unavailable;
     }
 
-    let output = match Command::new(cargo)
+    let mut child = match Command::new(cargo)
         .args(["check", "--target", "wasm32-unknown-unknown", "--quiet"])
         .current_dir(temp_dir.path())
-        .output()
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
     {
-        Ok(output) => output,
+        Ok(child) => child,
         Err(err) if err.kind() == io::ErrorKind::NotFound => {
             return CompileCheckOutcome::Unavailable;
         }
         Err(_) => return CompileCheckOutcome::Unavailable,
     };
 
-    classify_output(&crate_info.name, &output)
+    match child.wait_timeout(CARGO_TIMEOUT) {
+        Ok(Some(_status)) => match child.wait_with_output() {
+            Ok(output) => classify_output(&crate_info.name, &output),
+            Err(_) => CompileCheckOutcome::Unavailable,
+        },
+        Ok(None) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            CompileCheckOutcome::Unavailable
+        }
+        Err(_) => CompileCheckOutcome::Unavailable,
+    }
 }
 
 impl WasmTargetCheck {
@@ -259,6 +314,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires network access and the wasm32-unknown-unknown target"]
     fn compile_check_passes_compatible_crate() {
         let info = CrateInfo {
             name: "hex".to_string(),
@@ -274,6 +330,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires network access and the wasm32-unknown-unknown target"]
     fn compile_check_fails_incompatible_crate() {
         let info = CrateInfo {
             name: "mio".to_string(),
@@ -309,5 +366,29 @@ mod tests {
         let result = WasmTargetCheck.run_with_cargo(&info, "/nonexistent/cargo");
         assert_eq!(result.severity, Severity::Pass);
         assert!(result.message.contains("blocklist"));
+    }
+
+    #[test]
+    fn rejects_invalid_crate_name() {
+        let info = CrateInfo {
+            name: "evil\n[build-dependencies]\nattacker = \"1\"".to_string(),
+            version: Some("1.0.0".to_string()),
+            features: vec![],
+            default_features: true,
+        };
+        let outcome = compile_check(&info);
+        assert_eq!(outcome, CompileCheckOutcome::Unavailable);
+    }
+
+    #[test]
+    fn rejects_invalid_version() {
+        let info = CrateInfo {
+            name: "hex".to_string(),
+            version: Some("1.0\"\n[build-dependencies]\nx = \"1\"".to_string()),
+            features: vec![],
+            default_features: true,
+        };
+        let outcome = compile_check(&info);
+        assert_eq!(outcome, CompileCheckOutcome::Unavailable);
     }
 }

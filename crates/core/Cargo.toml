@@ -13,3 +13,4 @@ toml = { workspace = true }
 thiserror = { workspace = true }
 cargo_toml = "0.22"
 tempfile = "3"
+wait-timeout = "0.2.1"
