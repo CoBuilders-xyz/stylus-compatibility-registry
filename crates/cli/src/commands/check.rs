@@ -24,6 +24,7 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
         version: args.version,
         features: vec![],
         default_features: true,
+        is_transitive: false,
     };
 
     let results = run_all_checks(&crate_info);

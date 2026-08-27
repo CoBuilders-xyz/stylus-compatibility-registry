@@ -58,6 +58,7 @@ mod tests {
             version: Some("0.2.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = WasmTargetCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Error);
@@ -70,6 +71,7 @@ mod tests {
             version: Some("0.8.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = WasmTargetCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Pass);

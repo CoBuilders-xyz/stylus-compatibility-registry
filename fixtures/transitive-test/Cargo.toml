@@ -1,0 +1,8 @@
+[package]
+name = "transitive-test"
+version = "0.1.0"
+edition = "2021"
+[workspace]
+[dependencies]
+hex = { version = "0.4", default-features = false }
+fs2 = "0.4"

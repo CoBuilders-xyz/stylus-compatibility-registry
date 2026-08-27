@@ -62,6 +62,7 @@ mod tests {
             version: Some("0.33.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = FloatUsageCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Warning);
@@ -74,6 +75,7 @@ mod tests {
             version: Some("2.0.0".to_string()),
             features: vec![],
             default_features: true,
+            is_transitive: false,
         };
         let result = FloatUsageCheck.run(&info);
         assert_eq!(result.severity, crate::types::Severity::Pass);

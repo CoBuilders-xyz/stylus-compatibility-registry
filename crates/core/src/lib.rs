@@ -30,8 +30,13 @@ pub enum AnalyzeError {
 pub fn analyze_project(
     manifest_path: &Path,
     data_dir: Option<&Path>,
+    include_transitive: bool,
 ) -> Result<ProjectReport, AnalyzeError> {
-    let deps = manifest::parse_dependencies(manifest_path)?;
+    let deps = if include_transitive {
+        manifest::resolve_full_tree(manifest_path)?
+    } else {
+        manifest::parse_dependencies(manifest_path)?
+    };
 
     let mut registry = KnownCratesRegistry::new();
     if let Some(dir) = data_dir {
