@@ -1,6 +1,7 @@
 pub mod async_usage;
 pub mod float_usage;
 pub mod no_std;
+pub mod simd;
 pub mod wasm_target;
 
 use crate::types::{CheckResult, CrateInfo};
@@ -16,6 +17,7 @@ pub fn all_checks() -> Vec<Box<dyn CrateCheck>> {
         Box::new(wasm_target::WasmTargetCheck),
         Box::new(float_usage::FloatUsageCheck),
         Box::new(async_usage::AsyncUsageCheck),
+        Box::new(simd::SimdCheck),
     ]
 }
 

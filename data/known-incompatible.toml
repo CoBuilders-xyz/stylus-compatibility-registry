@@ -197,3 +197,41 @@ requires_std = true
 has_float = false
 has_async = false
 notes = "Requires std for I/O and threading"
+
+# --- SIMD ---
+
+[[crate]]
+name = "packed_simd"
+requires_std = false
+has_float = true
+has_async = false
+notes = "Portable SIMD types, nightly-only via #![feature(...)]. Stylus rejects v128 opcodes"
+
+[[crate]]
+name = "packed_simd_2"
+requires_std = false
+has_float = true
+has_async = false
+notes = "Maintained fork of packed_simd, same nightly requirement and same v128 output"
+
+[[crate]]
+name = "wide"
+requires_std = false
+has_float = true
+has_async = false
+notes = "Emits v128 only under target_feature simd128, otherwise scalar. Float types either way"
+
+[[crate]]
+name = "simdeez"
+requires_std = true
+has_float = true
+has_async = false
+notes = "no_std only behind its no_std feature. x86 engines plus a wasm32 simd128 engine"
+
+[[crate]]
+name = "ultraviolet"
+requires_std = true
+has_float = true
+has_async = false
+alternative = "fixed (for fixed-point arithmetic)"
+notes = "3D math built on wide, no no_std support"
