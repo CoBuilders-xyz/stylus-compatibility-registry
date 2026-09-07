@@ -188,19 +188,26 @@ mod tests {
 
 ### 2. Register the check
 
-Add it to `crates/core/src/checks/mod.rs`:
+Add it to `crates/core/src/checks/mod.rs`, which is the only list of checks:
 
 ```rust
 pub mod your_check;
 
-// In all_checks():
-pub fn all_checks() -> Vec<Box<dyn CrateCheck>> {
+// In run_all_checks():
+pub fn run_all_checks(
+    crate_info: &CrateInfo,
+    entry: Option<&KnownCrateEntry>,
+) -> Vec<CheckResult> {
     vec![
         // ... existing checks ...
-        Box::new(your_check::YourCheck),
+        your_check::YourCheck.run(crate_info),
     ]
 }
 ```
+
+If your check has a matching field in the registry, give it a `check_against_registry`
+that reads the entry and falls back to `self.run` when the crate is absent, the way
+`no_std`, `float_usage` and `async_usage` do, and call that here instead of `run`.
 
 ### 3. Add unit tests
 
@@ -246,6 +253,9 @@ notes = "Brief explanation"   # optional: configuration tips
 ### 3. Open a PR
 
 Include evidence: a link to the crate's `Cargo.toml` showing `no_std` support, or a compilation error log if incompatible.
+
+These three flags are what the `no_std`, `float_usage` and `async_usage` checks read, and an entry
+takes precedence over the blocklists and over the source scan. A wrong flag silences a real problem.
 
 ## Getting Help
 

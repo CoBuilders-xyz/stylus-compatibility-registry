@@ -27,7 +27,8 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
         is_transitive: false,
     };
 
-    let results = run_all_checks(&crate_info);
+    // `check` takes no data dir, so it runs on the built-in blocklists only.
+    let results = run_all_checks(&crate_info, None);
     let score = compute_score(&results);
 
     if args.json {
