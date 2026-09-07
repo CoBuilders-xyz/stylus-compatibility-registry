@@ -13,6 +13,14 @@ pub struct CheckArgs {
     #[arg(short, long)]
     pub version: Option<String>,
 
+    /// Features to enable, comma separated or repeated
+    #[arg(long, value_delimiter = ',')]
+    pub features: Vec<String>,
+
+    /// Do not enable the crate's default features
+    #[arg(long)]
+    pub no_default_features: bool,
+
     /// Output as JSON
     #[arg(long)]
     pub json: bool,
@@ -22,8 +30,8 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
     let crate_info = CrateInfo {
         name: args.crate_name.clone(),
         version: args.version,
-        features: vec![],
-        default_features: true,
+        features: args.features,
+        default_features: !args.no_default_features,
         is_transitive: false,
     };
 
@@ -49,7 +57,12 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
             Severity::Warning => "⚠".yellow(),
             Severity::Error => "✗".red(),
         };
-        println!("  {} [{}] {}", icon, result.check_name, result.message);
+        println!(
+            "  {} [{}] {}",
+            icon,
+            result.check_name,
+            super::indent_message(&result.message)
+        );
     }
 
     println!("{}", "─".repeat(50));

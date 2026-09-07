@@ -69,7 +69,7 @@ fn print_report(report: &stylus_compat_core::types::ProjectReport) {
                     Severity::Error => "✗".red(),
                     Severity::Pass => unreachable!(),
                 };
-                println!("    {} {}", icon, result.message);
+                println!("    {} {}", icon, super::indent_message(&result.message));
             }
         } else {
             println!(
