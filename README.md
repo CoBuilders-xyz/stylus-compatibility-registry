@@ -79,6 +79,9 @@ cargo build
 cargo run -- check tokio
 cargo run -- check tiny-keccak
 
+# Same, but consulting the curated registry instead of the built-in blocklists
+cargo run -- check tokio --data-dir data/
+
 # Analyze all dependencies in a Cargo.toml
 cargo run -- check-deps --manifest path/to/Cargo.toml --data-dir data/
 
