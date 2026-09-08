@@ -6,7 +6,6 @@ pub mod types;
 
 use std::path::Path;
 
-use checks::no_std::NoStdCheck;
 use checks::run_all_checks;
 use registry::KnownCratesRegistry;
 use score::{compute_project_score, compute_score};
@@ -53,25 +52,12 @@ pub fn analyze_project_with_transitive(
         registry.load_data_dir(dir)?;
     }
 
-    let no_std_check = NoStdCheck;
     let mut crate_reports = Vec::new();
     let mut total_errors = 0;
     let mut total_warnings = 0;
 
     for dep in &deps {
-        let registry_entry = registry.lookup(&dep.name);
-
-        // Use registry-aware check for no_std, then run the remaining generic checks
-        let no_std_result = no_std_check.check_against_registry(dep, registry_entry);
-        let mut results = vec![no_std_result];
-
-        let generic_results = run_all_checks(dep);
-        // Skip the generic no_std result since we already have a registry-aware one
-        for r in generic_results {
-            if r.check_name != "no_std" {
-                results.push(r);
-            }
-        }
+        let results = run_all_checks(dep, registry.lookup(&dep.name));
 
         let error_count = results
             .iter()

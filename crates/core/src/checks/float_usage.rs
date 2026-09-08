@@ -1,4 +1,5 @@
 use crate::checks::CrateCheck;
+use crate::registry::KnownCrateEntry;
 use crate::types::{CheckResult, CrateInfo};
 use flate2::read::GzDecoder;
 use regex::Regex;
@@ -466,6 +467,37 @@ impl CrateCheck for FloatUsageCheck {
     }
 }
 
+impl FloatUsageCheck {
+    pub fn check_against_registry(
+        &self,
+        crate_info: &CrateInfo,
+        entry: Option<&KnownCrateEntry>,
+    ) -> CheckResult {
+        if let Some(entry) = entry {
+            if entry.has_float {
+                return CheckResult::warning(
+                    self.name(),
+                    format!(
+                        "`{}` uses floating-point operations: {}",
+                        crate_info.name,
+                        entry.notes.as_deref().unwrap_or("no details")
+                    ),
+                );
+            }
+            return CheckResult::pass(
+                self.name(),
+                format!(
+                    "`{}` is verified free of floating-point usage",
+                    crate_info.name
+                ),
+            );
+        }
+
+        // Not in registry, fall back to the blocklist and the source scan
+        self.run(crate_info)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -478,6 +510,41 @@ mod tests {
             default_features: true,
             is_transitive: false,
         }
+    }
+
+    fn registry_entry(name: &str, has_float: bool) -> KnownCrateEntry {
+        KnownCrateEntry {
+            name: name.to_string(),
+            requires_std: false,
+            has_float,
+            has_async: false,
+            max_version: None,
+            alternative: None,
+            notes: Some("heavily uses f32/f64".to_string()),
+        }
+    }
+
+    #[test]
+    fn warns_on_float_via_registry() {
+        let entry = registry_entry("nalgebra", true);
+        let result = FloatUsageCheck
+            .check_against_registry(&crate_info("nalgebra", Some("0.33.0")), Some(&entry));
+        assert_eq!(result.severity, crate::types::Severity::Warning);
+        assert!(result.message.contains("heavily uses f32/f64"));
+    }
+
+    #[test]
+    fn registry_wins_over_the_blocklist() {
+        let entry = registry_entry("rand", false);
+        let result = FloatUsageCheck
+            .check_against_registry(&crate_info("rand", Some("0.8.5")), Some(&entry));
+        assert_eq!(result.severity, crate::types::Severity::Pass);
+    }
+
+    #[test]
+    fn falls_back_to_the_blocklist_without_an_entry() {
+        let result = FloatUsageCheck.check_against_registry(&crate_info("nalgebra", None), None);
+        assert_eq!(result.severity, crate::types::Severity::Warning);
     }
 
     #[test]
