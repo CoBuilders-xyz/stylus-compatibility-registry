@@ -1,6 +1,8 @@
 use clap::Args;
 use colored::Colorize;
+use std::path::PathBuf;
 use stylus_compat_core::checks::run_all_checks;
+use stylus_compat_core::registry::KnownCratesRegistry;
 use stylus_compat_core::score::compute_score;
 use stylus_compat_core::types::{CrateInfo, Severity};
 
@@ -21,6 +23,10 @@ pub struct CheckArgs {
     #[arg(long)]
     pub no_default_features: bool,
 
+    /// Directory containing the known-crates TOML files
+    #[arg(short, long)]
+    pub data_dir: Option<PathBuf>,
+
     /// Output as JSON
     #[arg(long)]
     pub json: bool,
@@ -35,8 +41,14 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
         is_transitive: false,
     };
 
-    // `check` takes no data dir, so it runs on the built-in blocklists only.
-    let results = run_all_checks(&crate_info, None);
+    // Without a data dir the registry stays empty, so every lookup misses and the
+    // checks run on their built-in blocklists.
+    let mut registry = KnownCratesRegistry::new();
+    if let Some(dir) = &args.data_dir {
+        registry.load_data_dir(dir)?;
+    }
+
+    let results = run_all_checks(&crate_info, registry.lookup(&crate_info.name));
     let score = compute_score(&results);
 
     if args.json {
