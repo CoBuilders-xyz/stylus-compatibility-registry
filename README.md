@@ -9,12 +9,12 @@ A Rust CLI and curated registry for reviewing dependencies before building an [A
 Install the beta from crates.io:
 
 ```sh
-cargo install stylus-registry --version 0.1.0-beta.1 --locked
+cargo install stylus-registry --version 0.1.0-beta.2 --locked
 rustup target add wasm32-unknown-unknown
 stylus-registry check tiny-keccak --features keccak
 ```
 
-Use a recent stable Rust toolchain. A prerelease version must be requested explicitly. Precompiled Linux, macOS and Windows executables are available in [GitHub Releases](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.1). They still need Cargo and the WASM target for compilation checks.
+Use a recent stable Rust toolchain. A prerelease version must be requested explicitly. Precompiled Linux, macOS and Windows executables are available in [GitHub Releases](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2). They still need Cargo and the WASM target for compilation checks.
 
 Cargo installs the executable, not the registry data. See the [installation guide](docs/usage.md) for the versioned data download, binary installation, and installation from GitHub.
 

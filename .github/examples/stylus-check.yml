@@ -18,9 +18,9 @@ jobs:
       - name: Install the beta CLI and matching registry
         shell: bash
         run: |
-          cargo install stylus-registry --version 0.1.0-beta.1 --locked
-          release=https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.1
-          archive=stylus-registry-data-v0.1.0-beta.1.tar.gz
+          cargo install stylus-registry --version 0.1.0-beta.2 --locked
+          release=https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2
+          archive=stylus-registry-data-v0.1.0-beta.2.tar.gz
           mkdir -p .stylus-registry
           cd .stylus-registry
           curl --fail --location --remote-name "$release/$archive"
@@ -31,6 +31,6 @@ jobs:
         run: >-
           stylus-registry check-deps
           --manifest Cargo.toml
-          --data-dir .stylus-registry/stylus-registry-data-v0.1.0-beta.1/data
+          --data-dir .stylus-registry/stylus-registry-data-v0.1.0-beta.2/data
           --include-transitive
           --strict

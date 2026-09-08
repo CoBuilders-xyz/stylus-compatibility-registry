@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-beta.2
+
+- Publish the educational beta described below, including the CLI, core library, native binaries, registry data and documentation.
+- Fix publication preflight to retain the verified Cargo archives before reading their checksums.
+- Exercise the publication script in dry-run mode on pull requests, including the first-publication and retry checks.
+- Preserve `v0.1.0-beta.1` as a failed publication attempt; no crates or GitHub release were published for that tag.
+- The [known beta limitations](docs/limitations.md) still apply.
+
 ## 0.1.0-beta.1
 
 First public beta of the CoBuilders Stylus Crate Compatibility Registry.
