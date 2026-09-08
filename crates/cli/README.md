@@ -3,7 +3,7 @@
 Experimental CLI from the CoBuilders Stylus Fellowship for reviewing Rust dependencies before building Arbitrum Stylus contracts.
 
 ```sh
-cargo install stylus-registry --version 0.1.0-beta.1 --locked
+cargo install stylus-registry --version 0.1.0-beta.2 --locked
 rustup target add wasm32-unknown-unknown
 stylus-registry check tiny-keccak --features keccak
 stylus-registry check-deps --manifest Cargo.toml --json

@@ -9,7 +9,9 @@ A release publishes two Cargo packages and a GitHub release:
 3. Native archives for Linux x86-64, macOS Intel, macOS Apple Silicon and Windows x86-64.
 4. A standalone registry-data archive, documentation, release notes and `SHA256SUMS`.
 
-The CLI's first public version is `0.1.0-beta.1`; its tag is `v0.1.0-beta.1`. Prerelease tags produce GitHub prereleases. Rust crate versions are immutable once published; release versions and tags must not be reused for different source.
+`v0.1.0-beta.1` was a failed publication attempt: no crates or GitHub release were published. Its tag is preserved.
+
+The CLI's first public version is `0.1.0-beta.2`; its tag is `v0.1.0-beta.2`. Prerelease tags produce GitHub prereleases. Rust crate versions are immutable once published; release versions and tags must not be reused for different source.
 
 Native artifacts are built on Ubuntu 22.04, macOS 15 Intel/ARM and Windows Server 2022. They are not code-signed or notarized by this project. Use a source installation if local platform policy requires it.
 
@@ -23,10 +25,10 @@ The workflow uses the normal GitHub Actions token to create the GitHub release; 
 
 ## Prepare the next release
 
-1. Update `[workspace.package].version` in `Cargo.toml`, for example to `0.1.0-beta.2`.
-2. Update `[workspace.dependencies].stylus-compat-core.version` to the same exact version, e.g. `=0.1.0-beta.2`.
+1. Update `[workspace.package].version` in `Cargo.toml`, for example to `0.1.0-beta.3`.
+2. Update `[workspace.dependencies].stylus-compat-core.version` to the same exact version, e.g. `=0.1.0-beta.3`.
 3. Run `cargo check --workspace` to update the workspace entries in `Cargo.lock`.
-4. Add the matching `## 0.1.0-beta.2` entry in `CHANGELOG.md`. Update versioned installation examples and links in the READMEs, usage guide and example workflow.
+4. Add the matching `## 0.1.0-beta.3` entry in `CHANGELOG.md`. Update versioned installation examples and links in the READMEs, usage guide and example workflow.
 5. Run the validation below, open a PR and merge it into `main` after the checks pass.
 
 ```sh
@@ -34,12 +36,12 @@ cargo fmt --check
 cargo clippy --locked -- -D warnings
 cargo test --locked
 cargo test --locked -p stylus-compat-core compile_check_ -- --ignored
-cargo publish --workspace --dry-run --locked
+python3 scripts/publish_crates.py --dry-run
 python3 -m unittest discover -s scripts -p 'test_*.py'
-python3 scripts/release.py validate --tag v0.1.0-beta.2
+python3 scripts/release.py validate --tag v0.1.0-beta.3
 ```
 
-When running package verification before committing, add `--allow-dirty` for that local dry run only. Release CI uses a clean checkout.
+The publication preflight requires a clean checkout. For package-only verification before committing, use `cargo package --workspace --locked --allow-dirty`.
 
 ## Trigger publication
 
@@ -48,14 +50,14 @@ After the preparation PR is merged, update local `main` and tag that commit:
 ```sh
 git switch main
 git pull --ff-only origin main
-git tag -a v0.1.0-beta.2 -m 'Stylus registry 0.1.0-beta.2'
-git push origin v0.1.0-beta.2
+git tag -a v0.1.0-beta.3 -m 'Stylus registry 0.1.0-beta.3'
+git push origin v0.1.0-beta.3
 ```
 
 Creating the tag is the deliberate version-selection step. Everything after the tag push is performed by [`.github/workflows/release.yml`](../.github/workflows/release.yml):
 
 - Validate the tag, workspace/core versions, lockfile and changelog. The tagged commit must belong to `origin/main`.
-- Run formatting, Clippy, Rust tests, real WASM compilation tests, release-script tests and a Cargo workspace publish dry run.
+- Run formatting, Clippy, Rust tests, real WASM compilation tests, release-script tests and the publication script in dry-run mode, including package creation and existing-version checksum checks.
 - Build each native target, run smoke checks that require actual WASM compilation, then exercise the executable and registry from its extracted archive.
 - Publish the core crate before the CLI. Verify `cargo install stylus-registry --version <version> --locked` from crates.io and smoke-test that installed binary.
 - Require all four native archives and the registry archive, calculate checksums, and upload the complete set to a draft GitHub release before publishing it.

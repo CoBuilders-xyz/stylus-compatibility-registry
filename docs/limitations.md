@@ -1,6 +1,6 @@
 # Beta limitations and known issues
 
-The `0.1.0-beta.1` release is educational, experimental tooling. Its reports combine a curated database, name-based heuristics and a compilation attempt. They are not an audit, a proof of VM compatibility, or evidence of on-chain deployment.
+The `0.1.0-beta.2` release is educational, experimental tooling. Its reports combine a curated database, name-based heuristics and a compilation attempt. They are not an audit, a proof of VM compatibility, or evidence of on-chain deployment.
 
 ## Interpret the checks accurately
 

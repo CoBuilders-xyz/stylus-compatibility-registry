@@ -1,6 +1,6 @@
 # Stylus registry: ecosystem and fellowship report
 
-**Release:** `v0.1.0-beta.1`
+**Release:** `v0.1.0-beta.2`
 
 **Prepared:** 2026-09-08
 
@@ -19,7 +19,7 @@ The project provides an executable starting point: a CLI, a reusable core librar
 | Output | Evidence |
 |---|---|
 | Open-source implementation and license | [Repository](https://github.com/CoBuilders-xyz/stylus-compatibility-registry), [MIT license](../LICENSE) |
-| Versioned public distribution | [Beta release](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.1), [CLI crate](https://crates.io/crates/stylus-registry), [core crate](https://crates.io/crates/stylus-compat-core) |
+| Versioned public distribution | [Beta release](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2), [CLI crate](https://crates.io/crates/stylus-registry), [core crate](https://crates.io/crates/stylus-compat-core) |
 | Usage guidelines | [Installation, examples and CI integration](usage.md) |
 | Architecture | [Component responsibilities, evidence precedence and extension points](architecture.md) |
 | Transparent limitations | [Beta limitations and known issues](limitations.md) |
@@ -77,6 +77,6 @@ This release includes no telemetry and this report makes no claim about producti
 
 ## Sources and reproducibility
 
-The inventory is reproducible from `Cargo.toml`, the two `data/*.toml` files, the CLI help, repository history and the linked workflows. Review the versioned source at [v0.1.0-beta.1](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/tree/v0.1.0-beta.1) rather than assuming future `main` has the same behavior.
+The inventory is reproducible from `Cargo.toml`, the two `data/*.toml` files, the CLI help, repository history and the linked workflows. Review the versioned source at [v0.1.0-beta.2](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/tree/v0.1.0-beta.2) rather than assuming future `main` has the same behavior.
 
 The underlying platform documentation is [Arbitrum Stylus](https://docs.arbitrum.io/stylus/overview); the registry is a fellowship tool and does not replace that specification or the actual contract validation process.

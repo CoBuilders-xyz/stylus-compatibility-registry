@@ -1,6 +1,6 @@
 # Installation and usage
 
-This guide targets `v0.1.0-beta.1`. Consult [limitations](limitations.md) before treating a report as an integration decision.
+This guide targets `v0.1.0-beta.2`. Consult [limitations](limitations.md) before treating a report as an integration decision.
 
 ## Prerequisites
 
@@ -18,27 +18,27 @@ A downloaded native binary does not remove these requirements. If compilation ca
 ## Install with Cargo
 
 ```sh
-cargo install stylus-registry --version 0.1.0-beta.1 --locked
+cargo install stylus-registry --version 0.1.0-beta.2 --locked
 stylus-registry --version
 ```
 
-Expected version: `stylus-registry 0.1.0-beta.1`. Put Cargo's binary directory on `PATH` if needed (`~/.cargo/bin` on Unix; `%USERPROFILE%\.cargo\bin` on Windows).
+Expected version: `stylus-registry 0.1.0-beta.2`. Put Cargo's binary directory on `PATH` if needed (`~/.cargo/bin` on Unix; `%USERPROFILE%\.cargo\bin` on Windows).
 
 The version is explicit because Cargo does not normally select prereleases. The library is published separately as `stylus-compat-core` for Rust consumers; installing the CLI resolves it automatically.
 
 Cargo does not install external registry TOML files. Download the matching data bundle:
 
 ```sh
-curl -fLO https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.1/stylus-registry-data-v0.1.0-beta.1.tar.gz
-tar -xzf stylus-registry-data-v0.1.0-beta.1.tar.gz
-stylus-registry check tokio --data-dir stylus-registry-data-v0.1.0-beta.1/data
+curl -fLO https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/stylus-registry-data-v0.1.0-beta.2.tar.gz
+tar -xzf stylus-registry-data-v0.1.0-beta.2.tar.gz
+stylus-registry check tokio --data-dir stylus-registry-data-v0.1.0-beta.2/data
 ```
 
 On Windows, download the same file from the release page and extract it with `tar -xzf` or an archive manager. Pass the extracted data directory with `--data-dir` (or `-d`). No registry is loaded automatically without that flag.
 
 ## Download a native executable
 
-Choose an archive from the [beta release](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.1):
+Choose an archive from the [beta release](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2):
 
 | Platform | Archive suffix |
 |---|---|
@@ -63,13 +63,13 @@ On Windows, use `./stylus-registry.exe`. You can move the executable onto `PATH`
 ## Install from GitHub or a local checkout
 
 ```sh
-cargo install --git https://github.com/CoBuilders-xyz/stylus-compatibility-registry.git --tag v0.1.0-beta.1 --locked stylus-registry
+cargo install --git https://github.com/CoBuilders-xyz/stylus-compatibility-registry.git --tag v0.1.0-beta.2 --locked stylus-registry
 ```
 
 Or build from source, including the data and examples:
 
 ```sh
-git clone --branch v0.1.0-beta.1 https://github.com/CoBuilders-xyz/stylus-compatibility-registry.git
+git clone --branch v0.1.0-beta.2 https://github.com/CoBuilders-xyz/stylus-compatibility-registry.git
 cd stylus-compatibility-registry
 cargo install --path crates/cli --locked
 stylus-registry check-deps --manifest fixtures/release-smoke/Cargo.toml --data-dir data/ --strict
