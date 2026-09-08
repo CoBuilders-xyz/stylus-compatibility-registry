@@ -24,6 +24,17 @@ pub struct KnownCrateEntry {
     pub notes: Option<String>,
 }
 
+impl KnownCrateEntry {
+    /// Trailing context for a check message. One note covers the whole crate, so every check
+    /// that appends it has to read as context rather than as its own reason.
+    pub fn note_suffix(&self) -> String {
+        match self.notes.as_deref().map(str::trim) {
+            Some(note) if !note.is_empty() => format!(". Registry note: {note}"),
+            _ => String::new(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct RegistryFile {
     #[serde(rename = "crate")]
@@ -92,6 +103,36 @@ mod tests {
     use super::*;
     use std::io::Write;
     use tempfile::NamedTempFile;
+
+    fn entry(notes: Option<&str>) -> KnownCrateEntry {
+        KnownCrateEntry {
+            name: "serde_json".to_string(),
+            requires_std: true,
+            has_float: true,
+            has_async: false,
+            max_version: None,
+            alternative: None,
+            notes: notes.map(str::to_string),
+        }
+    }
+
+    #[test]
+    fn note_suffix_reads_as_context() {
+        assert_eq!(
+            entry(Some("Uses std::io for formatting")).note_suffix(),
+            ". Registry note: Uses std::io for formatting"
+        );
+    }
+
+    #[test]
+    fn note_suffix_is_empty_without_a_note() {
+        assert_eq!(entry(None).note_suffix(), "");
+    }
+
+    #[test]
+    fn note_suffix_is_empty_for_a_blank_note() {
+        assert_eq!(entry(Some("   ")).note_suffix(), "");
+    }
 
     #[test]
     fn loads_registry_from_toml() {

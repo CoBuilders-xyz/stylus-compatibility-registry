@@ -478,9 +478,9 @@ impl FloatUsageCheck {
                 return CheckResult::warning(
                     self.name(),
                     format!(
-                        "`{}` uses floating-point operations: {}",
+                        "`{}` uses floating-point operations{}",
                         crate_info.name,
-                        entry.notes.as_deref().unwrap_or("no details")
+                        entry.note_suffix()
                     ),
                 );
             }
@@ -530,7 +530,18 @@ mod tests {
         let result = FloatUsageCheck
             .check_against_registry(&crate_info("nalgebra", Some("0.33.0")), Some(&entry));
         assert_eq!(result.severity, crate::types::Severity::Warning);
-        assert!(result.message.contains("heavily uses f32/f64"));
+        assert!(result
+            .message
+            .contains("uses floating-point operations. Registry note: heavily uses f32/f64"));
+    }
+
+    #[test]
+    fn omits_the_note_when_the_entry_has_none() {
+        let mut entry = registry_entry("nalgebra", true);
+        entry.notes = None;
+        let result = FloatUsageCheck
+            .check_against_registry(&crate_info("nalgebra", Some("0.33.0")), Some(&entry));
+        assert_eq!(result.message, "`nalgebra` uses floating-point operations");
     }
 
     #[test]

@@ -55,9 +55,9 @@ impl AsyncUsageCheck {
                 return CheckResult::error(
                     self.name(),
                     format!(
-                        "`{}` pulls in an async runtime: {}",
+                        "`{}` pulls in an async runtime{}",
                         crate_info.name,
-                        entry.notes.as_deref().unwrap_or("no details")
+                        entry.note_suffix()
                     ),
                 );
             }
@@ -116,7 +116,17 @@ mod tests {
         let entry = registry_entry("axum", true);
         let result = AsyncUsageCheck.check_against_registry(&crate_info("axum"), Some(&entry));
         assert_eq!(result.severity, Severity::Error);
-        assert!(result.message.contains("async web framework"));
+        assert!(result
+            .message
+            .contains("pulls in an async runtime. Registry note: async web framework"));
+    }
+
+    #[test]
+    fn omits_the_note_when_the_entry_has_none() {
+        let mut entry = registry_entry("axum", true);
+        entry.notes = None;
+        let result = AsyncUsageCheck.check_against_registry(&crate_info("axum"), Some(&entry));
+        assert_eq!(result.message, "`axum` pulls in an async runtime");
     }
 
     #[test]
