@@ -36,7 +36,7 @@ flowchart TD
 1. `check` constructs a single `CrateInfo` from arguments, including features and default-feature selection. `check-deps` calls `analyze_project_with_transitive`.
 2. Direct analysis uses `cargo_toml`; transitive analysis uses `cargo_metadata` and marks dependencies as transitive. See `manifest.rs` for the supported resolution behavior.
 3. If a data directory is provided, `KnownCratesRegistry` loads `known-compatible.toml` followed by `known-incompatible.toml` into a `HashMap`. Later records with the same name replace earlier ones. Missing files are skipped; malformed existing TOML is an error.
-4. `checks::run_all_checks` executes the five checks once, in a fixed order. Std, float and async checks receive the matching registry entry.
+4. `checks::run_all_checks` executes the six checks once, in a fixed order. Std, float and async checks receive the matching registry entry, and the allocator check receives the dependency tree when there is one.
 5. Each result has a name, severity and explanatory message. Scores and counts are computed from these results, and the CLI renders the report.
 
 ## Shared data model
@@ -58,6 +58,7 @@ Serde provides JSON serialization. TOML parsing errors and filesystem errors pro
 | `float_usage` | `has_float=true` warns; false passes without a scan | Known float names warn; otherwise scan downloaded Rust source if a version was supplied |
 | `async_usage` | `has_async=true` is an error; false passes | Known async runtime names are errors |
 | `simd_usage` | Registry is not consulted | Known SIMD crate names warn; other names pass |
+| `allocator` | Registry is not consulted | Known global-allocator names are errors when `stylus-sdk` is in the tree with `mini-alloc` active, warnings otherwise; other names pass |
 
 Registry precedence is deliberate: adding a curated flag must change the result, and registry hits avoid unnecessary source downloads. It also places responsibility on data maintainers. A false flag is a positive override, not “unknown”. Records currently cannot express per-version or per-feature conditions.
 
