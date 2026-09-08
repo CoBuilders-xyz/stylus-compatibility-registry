@@ -26,15 +26,15 @@ The [usage guide](usage.md) explains how to download the registry data and pass 
 
 A score is a triage aid. The beta can report `Pass` when a check falls back without compiling. Read the result messages and validate your complete contract with the Stylus toolchain.
 
-## Registry research and fellowship
+## Registry data
 
-The [September 2026 registry report](reports/2026-09-08/README.md) provides a frozen inventory, reproducible counts and examples of actual CLI reports. It describes curated coverage and configuration pitfalls. It does not measure users, deployed contracts or ecosystem-wide adoption.
+The [September 2026 registry report](reports/2026-09-08/README.md) provides a frozen inventory, reproducible counts and examples of actual CLI reports. It describes curated coverage and configuration pitfalls.
 
-Read [fellowship outcomes](fellowship-outcomes.md) for delivered capabilities and future student exercises. The original [ecosystem and fellowship report](fellowship-report.md) remains available as part of the beta documentation.
+The [roadmap](roadmap.md) describes planned improvements to evidence handling, registry rules and dependency analysis.
 
 ## Release package
 
-- [Deliverables and publication evidence](release.md)
+- [Publication evidence](release.md)
 - [Release notes](release-notes.md)
 - [Validation and reproducibility](validation.md)
 - [Maintaining this site](publishing.md)

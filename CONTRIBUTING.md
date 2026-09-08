@@ -1,6 +1,6 @@
 # Contributing to Stylus Crate Compatibility Registry
 
-Thank you for contributing! This is a collaborative project built by the Stylus Fellowship cohort. This guide will help you get started.
+This guide explains how to build, test and contribute to the Stylus Crate Compatibility Registry.
 
 ## Architecture Overview
 
@@ -265,6 +265,6 @@ takes precedence over the blocklists and over the source scan. A wrong flag sile
 
 ## Beta release and documentation
 
-Read [architecture](docs/architecture.md) before extending the pipeline and [limitations](docs/limitations.md) before making compatibility claims. Keep registry data and descriptions tied to reproducible evidence. The beta intentionally leaves several student-sized issues open.
+Read [architecture](docs/architecture.md) before extending the pipeline and [limitations](docs/limitations.md) before making compatibility claims. Keep registry data and descriptions tied to reproducible evidence. See the [roadmap](docs/roadmap.md) for planned improvements.
 
 [Release preparation and publishing](docs/releases.md) documents versioning, package checks and the tag-driven workflow. Never commit publishing credentials. The publication workflow is exercised on PRs without uploading packages; actual publishing follows a versioned tag on `main`.

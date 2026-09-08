@@ -114,7 +114,7 @@ def verify_bundle(target, root=ROOT):
         report = json.loads(result.stdout)
         if not any("requires std, threads, I/O polling" in item["message"] for item in report["results"]):
             raise ValueError("Packaged registry data did not load")
-        for path in ("LICENSE", "docs/usage.md", "docs/architecture.md", "docs/fellowship-report.md", "BUILD-INFO.json"):
+        for path in ("LICENSE", "docs/usage.md", "docs/architecture.md", "docs/methodology.md", "BUILD-INFO.json"):
             if not (stage / path).is_file():
                 raise ValueError(f"Missing release file: {path}")
     print(f"Verified executable, registry and documentation in {archive.name}")
@@ -150,7 +150,7 @@ stylus-registry check tiny-keccak --features keccak
 Cargo installs the executable; use the data archive below for `--data-dir`.
 Native executable archives include the data, license, docs and build information.
 See [installation]({url}/docs/usage.md), [architecture]({url}/docs/architecture.md),
-[known limitations]({url}/docs/limitations.md), and the [fellowship report]({url}/docs/fellowship-report.md).
+[known limitations]({url}/docs/limitations.md), and the [check methodology]({url}/docs/methodology.md).
 
 Checksums are in `SHA256SUMS`. This beta's scores are heuristics, not deployment certification.
 """

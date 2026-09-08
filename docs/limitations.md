@@ -1,6 +1,6 @@
 # Beta limitations and known issues
 
-The `0.1.0-beta.2` release is educational, experimental tooling. Its reports combine a curated database, name-based heuristics and a compilation attempt. They are not an audit, a proof of VM compatibility, or evidence of on-chain deployment.
+The `0.1.0-beta.2` release is experimental tooling. Its reports combine a curated database, name-based heuristics and a compilation attempt. They are not an audit, a proof of VM compatibility, or evidence of on-chain deployment.
 
 ## Interpret the checks accurately
 
@@ -28,7 +28,7 @@ These are known limitations, not successful compatibility validations. Do not de
 
 Binary size estimation (#5), feature-aware registry conditions (#6), automatic alternative suggestions (#7), full source verification for `no_std` (#11), search/info commands, configurable scoring, a database and a web frontend are not part of this release. `alternative` values are present in the data but are not printed as automatic recommendations by the CLI.
 
-Coverage consists of 54 curated entries. The “compatible” and “incompatible” filenames are classifications inherited from the educational registry, not independently verified deployment results for every version and configuration.
+Coverage consists of 54 curated entries. The “compatible” and “incompatible” filenames are curated classifications, not independently verified deployment results for every version and configuration.
 
 ## Reproducibility and external effects
 

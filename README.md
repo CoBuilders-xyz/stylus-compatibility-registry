@@ -1,6 +1,6 @@
 # Stylus Crate Compatibility Registry
 
-**Beta · educational tooling from the CoBuilders Stylus Fellowship · MIT licensed**
+**Beta · Rust dependency analysis for Arbitrum Stylus · MIT licensed**
 
 A Rust CLI and curated registry for reviewing dependencies before building an [Arbitrum Stylus](https://docs.arbitrum.io/stylus/overview) contract. It helps identify configuration issues and dependencies worth investigating; it does not certify that a contract can activate or execute on-chain.
 
@@ -70,10 +70,10 @@ The [mixed dependency fixture](fixtures/test-project/Cargo.toml) intentionally p
 - [Architecture and extension points](docs/architecture.md)
 - [Beta limitations and known issues](docs/limitations.md)
 - [Release process and crates.io publishing](docs/releases.md)
-- [Registry ecosystem and fellowship report](docs/fellowship-report.md)
+- [Registry coverage report](docs/reports/2026-09-08/README.md)
 - [Contributing](CONTRIBUTING.md) and [changelog](CHANGELOG.md)
 
-Binary size estimation, automatic alternative suggestions, a searchable web registry, and broader ecosystem coverage remain student project opportunities. See the [open issues](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues).
+Binary size estimation, automatic alternative suggestions, a searchable web registry, and broader ecosystem coverage remain on the [roadmap](docs/roadmap.md). See the [open issues](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues).
 
 ## License
 

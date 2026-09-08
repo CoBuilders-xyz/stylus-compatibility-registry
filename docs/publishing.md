@@ -2,7 +2,7 @@
 
 ## Presentation and source
 
-This site adapts the fellowship dashboard's Docsify presentation: sidebar navigation, browser-local search, appearance controls, a page index and Mermaid diagrams. Documentation remains ordinary Markdown under `docs/`.
+This site uses Docsify with sidebar navigation, browser-local search, appearance controls, a page index and Mermaid diagrams. Documentation remains ordinary Markdown under `docs/`.
 
 The intended public URL is [cobuilders-xyz.github.io/stylus-compatibility-registry](https://cobuilders-xyz.github.io/stylus-compatibility-registry/). GitHub Pages serves the output of the **Docs** workflow from `main`. The website tracks documentation changes; the dated report stays frozen unless an explicitly documented correction is made.
 

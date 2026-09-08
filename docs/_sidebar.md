@@ -6,12 +6,11 @@
 - **TECHNICAL GUIDES**
   - [Architecture](/architecture.md)
   - [Release automation](/releases.md)
-- **REGISTRY & FELLOWSHIP**
+- **REGISTRY DATA**
   - [Registry report · Sep 2026](/reports/2026-09-08/README.md)
-  - [Fellowship outcomes](/fellowship-outcomes.md)
-  - [Original beta report](/fellowship-report.md)
+  - [Roadmap](/roadmap.md)
 - **RELEASE**
-  - [Deliverables & evidence](/release.md)
+  - [Publication evidence](/release.md)
   - [Release notes](/release-notes.md)
   - [Validation](/validation.md)
   - [Maintaining this site](/publishing.md)

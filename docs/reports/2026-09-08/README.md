@@ -2,7 +2,7 @@
 
 **Snapshot:** 8 September 2026 · **Tool:** `v0.1.0-beta.2` · **Source:** `59460476068542e5cb9e1fef88a2c51f3a2b7003`.
 
-This report describes the registry's curated inventory and two observed CLI configurations. It contributes technical findings to the fellowship's ecosystem documentation. It is not a sample of all Rust crates, an on-chain dataset or a measure of Stylus adoption.
+This report describes the registry's curated inventory and two observed CLI configurations. Its counts describe this versioned dataset, not all Rust crates or contracts deployed on-chain.
 
 ## Findings
 
@@ -22,7 +22,7 @@ Flags overlap. Their counts cannot be added to derive an incompatible total. The
 
 ## What the inventory tells us
 
-The data provides an inspectable starting point for dependency review. Every record has notes, but feature conditions remain prose and lookup is by name. A useful next cohort exercise is to convert a small set of notes into reproducible version/feature cases before expanding the number of records.
+The data provides an inspectable starting point for dependency review. Every record has notes, but feature conditions remain prose and lookup is by name. Registry entries need reproducible version/feature cases to make their conditions testable.
 
 The six stored alternatives show available curation work that is not yet exposed as automatic recommendations. Implementing that feature needs a clear distinction between a suggested library and a tested replacement.
 
@@ -60,4 +60,4 @@ The snapshot SHA-256 is `3a23f043054537df3be4f29c20227d981037f8708f8f9ba351ea156
 - [CLI commands, toolchain and reports](examples.json)
 - [Public release, workflow and crates.io record](publication.json)
 
-These records are dated observations. Registry changes and future downloads do not update this snapshot automatically. See [validation](../../validation.md) for the checks performed and [fellowship outcomes](../../fellowship-outcomes.md) for recommended follow-up work.
+These records are dated observations. Registry changes and future downloads do not update this snapshot automatically. See [validation](../../validation.md) for the checks performed and [roadmap](../../roadmap.md) for recommended follow-up work.

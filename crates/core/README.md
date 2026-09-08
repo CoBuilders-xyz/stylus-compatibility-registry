@@ -1,6 +1,6 @@
 # stylus-compat-core
 
-Experimental Rust library behind the Stylus Crate Compatibility Registry, an educational project from the CoBuilders Stylus Fellowship.
+Experimental Rust library for the Stylus Crate Compatibility Registry.
 
 It parses Cargo manifests and dependency trees, loads a curated TOML registry, runs five compatibility heuristics, and produces serializable reports and scores.
 

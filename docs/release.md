@@ -1,4 +1,4 @@
-# Release evidence and deliverables
+# Release evidence
 
 ## Published beta
 
@@ -6,20 +6,16 @@
 
 The [GitHub prerelease](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2), [CLI crate](https://crates.io/crates/stylus-registry/0.1.0-beta.2) and [core crate](https://crates.io/crates/stylus-compat-core/0.1.0-beta.2) are public. The [release workflow](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/actions/runs/34268848187) succeeded on its second attempt after crates.io account email verification.
 
-## Deliverable mapping
+## Published components
 
-| Phase commitment | Registry evidence | State |
-|---|---|---|
-| Public release of the second Stylus tooling initiative | Cargo packages and four native archives | Published beta |
-| Public open-source release, registry portion | [Repository](https://github.com/CoBuilders-xyz/stylus-compatibility-registry), [MIT license](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/LICENSE), tagged source | Published |
-| Documentation and usage guidelines | [Usage](usage.md), [methodology](methodology.md), [limitations](limitations.md) | Included |
-| Architectural documentation | [Architecture](architecture.md), [release operations](releases.md) | Included |
-| Final documentation package | [Documentation index](README.md), downloadable supplement and original release archives | Included; site publication tracked by the Docs workflow |
-| Public ecosystem report | [Registry inventory and technical findings](reports/2026-09-08/README.md) | Registry-specific contribution; no adoption measurement |
-| Fellowship outcomes and recommendations | [Outcomes](fellowship-outcomes.md), [original report](fellowship-report.md) | Repository-specific assessment |
-| Public dashboard deployment | Separate dashboard repository | Outside this repository's scope |
-
-This mapping covers this repository only. It does not claim completion of deliverables belonging to other projects or measured program-wide outcomes.
+| Component | Distribution |
+|---|---|
+| CLI | `stylus-registry 0.1.0-beta.2` on crates.io |
+| Core library | `stylus-compat-core 0.1.0-beta.2` on crates.io |
+| Native executables | Linux x86-64, macOS Intel/Apple Silicon and Windows x86-64 |
+| Registry data | Standalone data archive and bundled with each native executable |
+| Source and license | Tagged public repository under the MIT license |
+| Documentation | Usage, architecture, check methodology, limitations and release operations |
 
 ## Distribution evidence
 

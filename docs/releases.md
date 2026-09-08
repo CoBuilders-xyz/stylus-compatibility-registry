@@ -74,7 +74,7 @@ A partial crates.io publication is resumed only if an existing version has the s
 
 A draft GitHub release can have assets replaced during a retry. Once public, the workflow refuses to overwrite its assets. Use a new release for fixes. A missing token or failed platform build leaves publication incomplete rather than silently omitting a promised distribution channel.
 
-After a successful run, check the release page, install with Cargo in a clean location, and download an archive to confirm its checksum. The workflow automates the installation and archive checks, while the release page remains the public evidence for the fellowship deliverable.
+After a successful run, check the release page, install with Cargo in a clean location, and download an archive to confirm its checksum. The workflow automates the installation and archive checks, while the release page records the published packages and their source version.
 
 ## Relevant documentation
 
