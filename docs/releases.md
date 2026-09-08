@@ -54,7 +54,7 @@ git tag -a v0.1.0-beta.3 -m 'Stylus registry 0.1.0-beta.3'
 git push origin v0.1.0-beta.3
 ```
 
-Creating the tag is the deliberate version-selection step. Everything after the tag push is performed by [`.github/workflows/release.yml`](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/.github/workflows/release.yml):
+Creating the tag is the deliberate version-selection step. Everything after the tag push is performed by [`.github/workflows/release.yml`](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/main/.github/workflows/release.yml):
 
 - Validate the tag, workspace/core versions, lockfile and changelog. The tagged commit must belong to `origin/main`.
 - Run formatting, Clippy, Rust tests, real WASM compilation tests, release-script tests and the publication script in dry-run mode, including package creation and existing-version checksum checks.
@@ -62,7 +62,7 @@ Creating the tag is the deliberate version-selection step. Everything after the 
 - Publish the core crate before the CLI. Verify `cargo install stylus-registry --version <version> --locked` from crates.io and smoke-test that installed binary.
 - Require all four native archives and the registry archive, calculate checksums, and upload the complete set to a draft GitHub release before publishing it.
 
-Pull requests touching release inputs exercise packaging for all platforms without access to the publishing secret and without publishing. The normal CI workflow also explicitly runs real WASM checks; a blocklist fallback cannot satisfy the smoke test.
+Pull requests touching release inputs run `scripts/publish_crates.py --prepare-only`: packages are built and their archive checksums read, without comparing PR commit metadata against an already published version. All four platforms are exercised without a publishing secret or uploads. Tagged releases use `--dry-run` and the publication step to enforce existing-version checksum identity. The normal CI workflow also explicitly runs real WASM checks; a blocklist fallback cannot satisfy the smoke test.
 
 The stable Rust channel and the Cargo lockfile are used for the beta. `BUILD-INFO.json` records the exact compiler, source commit, version and native target in each archive. The process does not claim bit-for-bit reproducibility across different compiler versions.
 

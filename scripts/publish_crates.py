@@ -24,17 +24,24 @@ def existing_checksum(name, version):
         raise
 
 
-def publish(dry_run=False):
+def publish(dry_run=False, prepare_only=False):
     value = validate()
     # Workspace packaging resolves both unpublished crates in a temporary registry
     # and verifies that they build before the first irreversible upload.
     # Unlike `cargo publish --dry-run`, `cargo package` retains the final
     # archives in target/package after verifying the workspace.
     subprocess.run(["cargo", "package", "--workspace", "--locked", "--target-dir", str(ROOT / "target")], cwd=ROOT, check=True)
-    pending = []
+    prepared = {}
     for name in PACKAGES:
         archive = ROOT / "target/package" / f"{name}-{value}.crate"
-        expected = hashlib.sha256(archive.read_bytes()).hexdigest()
+        prepared[name] = hashlib.sha256(archive.read_bytes()).hexdigest()
+    if prepare_only:
+        # PR commits have different VCS metadata from an already published
+        # version. Verify archive creation without testing publication identity.
+        print(f"Prepared and verified archives: {', '.join(prepared)}", flush=True)
+        return
+    pending = []
+    for name, expected in prepared.items():
         current = existing_checksum(name, value)
         if current is not None:
             if current != expected:
@@ -52,5 +59,8 @@ def publish(dry_run=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dry-run", action="store_true", help="Verify packages and existing versions without uploading")
-    publish(dry_run=parser.parse_args().dry_run)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true", help="Verify packages and existing versions without uploading")
+    mode.add_argument("--prepare-only", action="store_true", help="Build and checksum archives for PR validation; do not query or publish registry versions")
+    args = parser.parse_args()
+    publish(dry_run=args.dry_run, prepare_only=args.prepare_only)

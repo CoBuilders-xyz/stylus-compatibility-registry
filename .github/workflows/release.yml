@@ -76,7 +76,15 @@ jobs:
         run: cargo test --locked -p stylus-compat-core compile_check_ -- --ignored
       - run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Verify both Cargo packages without publishing
-        run: python scripts/publish_crates.py --dry-run
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = pull_request ]; then
+            python scripts/publish_crates.py --prepare-only
+          else
+            python scripts/publish_crates.py --dry-run
+          fi
       - name: Bundle versioned registry data and documentation
         run: python scripts/release.py data-bundle
       - uses: actions/upload-artifact@v4
