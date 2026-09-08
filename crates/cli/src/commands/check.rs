@@ -1,6 +1,8 @@
 use clap::Args;
 use colored::Colorize;
+use std::path::PathBuf;
 use stylus_compat_core::checks::run_all_checks;
+use stylus_compat_core::registry::KnownCratesRegistry;
 use stylus_compat_core::score::compute_score;
 use stylus_compat_core::types::{CrateInfo, Severity};
 
@@ -13,6 +15,18 @@ pub struct CheckArgs {
     #[arg(short, long)]
     pub version: Option<String>,
 
+    /// Features to enable, comma separated or repeated
+    #[arg(long, value_delimiter = ',')]
+    pub features: Vec<String>,
+
+    /// Do not enable the crate's default features
+    #[arg(long)]
+    pub no_default_features: bool,
+
+    /// Directory containing the known-crates TOML files
+    #[arg(short, long)]
+    pub data_dir: Option<PathBuf>,
+
     /// Output as JSON
     #[arg(long)]
     pub json: bool,
@@ -22,12 +36,19 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
     let crate_info = CrateInfo {
         name: args.crate_name.clone(),
         version: args.version,
-        features: vec![],
-        default_features: true,
+        features: args.features,
+        default_features: !args.no_default_features,
         is_transitive: false,
     };
 
-    let results = run_all_checks(&crate_info);
+    // Without a data dir the registry stays empty, so every lookup misses and the
+    // checks run on their built-in blocklists.
+    let mut registry = KnownCratesRegistry::new();
+    if let Some(dir) = &args.data_dir {
+        registry.load_data_dir(dir)?;
+    }
+
+    let results = run_all_checks(&crate_info, registry.lookup(&crate_info.name));
     let score = compute_score(&results);
 
     if args.json {
@@ -49,7 +70,12 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
             Severity::Warning => "⚠".yellow(),
             Severity::Error => "✗".red(),
         };
-        println!("  {} [{}] {}", icon, result.check_name, result.message);
+        println!(
+            "  {} [{}] {}",
+            icon,
+            result.check_name,
+            super::indent_message(&result.message)
+        );
     }
 
     println!("{}", "─".repeat(50));
