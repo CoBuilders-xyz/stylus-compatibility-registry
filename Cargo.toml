@@ -1,6 +1,6 @@
 [workspace]
 members = ["crates/core", "crates/cli"]
-exclude = ["fixtures/transitive-test", "fixtures/test-project"]
+exclude = ["fixtures/transitive-test", "fixtures/test-project", "fixtures/stylus-project"]
 resolver = "2"
 
 [workspace.package]

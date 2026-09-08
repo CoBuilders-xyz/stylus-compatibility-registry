@@ -1,0 +1,15 @@
+[package]
+name = "stylus-allocator-fixture"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Registers mini-alloc as the global allocator through its default features.
+stylus-sdk = "0.10"
+
+# A second global allocator, which is the conflict the allocator check reports.
+wee_alloc = "0.4"
+
+# Neither of these registers one, so both should pass.
+tiny-keccak = "2.0"
+dlmalloc = "0.2"
