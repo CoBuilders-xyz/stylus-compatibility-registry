@@ -1,0 +1,207 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/release.yml'
+      - '.github/examples/**'
+      - 'scripts/**'
+      - 'crates/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'data/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'fixtures/release-smoke/**'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to retry (for example v0.1.0-beta.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.pull_request.number || inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Release validation
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      sha: ${{ steps.version.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Validate version, changelog and release source
+        id: version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = pull_request ]; then
+            python scripts/release.py validate >> "$GITHUB_OUTPUT"
+          else
+            python scripts/release.py validate --tag "$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+            test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
+            git merge-base --is-ancestor HEAD origin/main
+          fi
+          printf 'sha=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - run: cargo fmt --check
+      - run: cargo clippy --locked -- -D warnings
+      - run: cargo test --locked
+      - name: Test real WASM compilation
+        run: cargo test --locked -p stylus-compat-core compile_check_ -- --ignored
+      - run: python -m unittest discover -s scripts -p 'test_*.py'
+      - name: Verify both Cargo packages without publishing
+        run: cargo publish --workspace --dry-run --locked
+      - name: Bundle versioned registry data and documentation
+        run: python scripts/release.py data-bundle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-registry-data
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  build:
+    name: Package ${{ matrix.target }}
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            executable: stylus-registry
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+            executable: stylus-registry
+          - os: macos-15
+            target: aarch64-apple-darwin
+            executable: stylus-registry
+          - os: windows-2022
+            target: x86_64-pc-windows-msvc
+            executable: stylus-registry.exe
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}, wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}
+      - run: cargo build --release --locked --target ${{ matrix.target }} --package stylus-registry
+      - name: Test native executable with real WASM checks
+        run: python scripts/smoke_test.py --binary target/${{ matrix.target }}/release/${{ matrix.executable }}
+      - run: python scripts/release.py bundle --target ${{ matrix.target }}
+      - name: Test executable and registry from the extracted archive
+        run: python scripts/release.py verify-bundle --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+          if-no-files-found: error
+
+  publish-crates:
+    name: Publish crates.io packages
+    if: github.event_name != 'pull_request'
+    needs: [validate, build]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Publish core, then CLI
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        shell: bash
+        run: |
+          if [ -z "$CARGO_REGISTRY_TOKEN" ]; then
+            echo 'Configure the CARGO_REGISTRY_TOKEN repository secret before publishing.' >&2
+            exit 1
+          fi
+          python scripts/publish_crates.py
+      - name: Verify installation from crates.io
+        env:
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+        shell: bash
+        run: |
+          cargo install stylus-registry --version "$RELEASE_VERSION" --locked --root target/installed-release
+          python scripts/smoke_test.py --binary target/installed-release/bin/stylus-registry
+
+  publish-github:
+    name: Publish GitHub release
+    if: github.event_name != 'pull_request'
+    needs: [validate, build, publish-crates]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - run: python scripts/release.py checksums
+      - run: python scripts/release.py notes
+      - name: Publish complete release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+          IS_PRERELEASE: ${{ needs.validate.outputs.prerelease }}
+        shell: bash
+        run: |
+          tag="v$RELEASE_VERSION"
+          if gh release view "$tag" --json isDraft > target-release-state.json 2>/dev/null; then
+            python -c 'import json; assert json.load(open("target-release-state.json"))["isDraft"], "Release already published; never overwrite published assets"'
+          else
+            gh release create "$tag" --verify-tag --draft --title "$tag" --notes-file dist/RELEASE_NOTES.md
+          fi
+          gh release upload "$tag" dist/*.tar.gz dist/*.zip dist/SHA256SUMS --clobber
+          gh release edit "$tag" --draft=false --prerelease="$IS_PRERELEASE" --notes-file dist/RELEASE_NOTES.md

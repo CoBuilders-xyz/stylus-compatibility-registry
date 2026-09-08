@@ -4,13 +4,13 @@ exclude = ["fixtures/transitive-test", "fixtures/test-project"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.0-beta.1"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/CoBuilders-xyz/stylus-compatibility-registry"
 
 [workspace.dependencies]
-stylus-compat-core = { path = "crates/core" }
+stylus-compat-core = { path = "crates/core", version = "=0.1.0-beta.1" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.8"

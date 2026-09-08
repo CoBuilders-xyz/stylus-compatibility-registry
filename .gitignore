@@ -25,3 +25,10 @@ coverage/
 
 # Misc
 *.log
+
+# Release archives
+/dist/
+
+# Python release tooling
+__pycache__/
+*.pyc

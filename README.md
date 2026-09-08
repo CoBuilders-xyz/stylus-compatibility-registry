@@ -1,150 +1,78 @@
 # Stylus Crate Compatibility Registry
 
-A CLI tool and curated registry for evaluating **Rust crate compatibility** with [Arbitrum Stylus](https://docs.arbitrum.io/stylus/overview) contracts.
+**Beta · educational tooling from the CoBuilders Stylus Fellowship · MIT licensed**
 
-> **Will this crate work in my Stylus contract? Does it need `no_std`? Will it blow the 24KB limit?**
-> This tool answers these questions before you waste hours on compilation errors.
+A Rust CLI and curated registry for reviewing dependencies before building an [Arbitrum Stylus](https://docs.arbitrum.io/stylus/overview) contract. It helps identify configuration issues and dependencies worth investigating; it does not certify that a contract can activate or execute on-chain.
 
-## What It Does
+## Install
 
-| Feature | Description |
-|---------|-------------|
-| **Dependency Checker** | Analyzes your `Cargo.toml` and flags crates incompatible with Stylus |
-| **Compatibility Score** | Rates each dependency 0-100 based on `no_std`, WASM target, floats, async |
-| **Known Crates Registry** | Curated TOML database of pre-verified compatible and incompatible crates |
-| **Alternative Suggestions** | Recommends Stylus-friendly replacements for incompatible dependencies |
-| **CI Integration** | `--strict` mode exits with code 1 on errors — plug into your CI pipeline |
+Install the beta from crates.io:
 
-## Architecture
-
-```
-[Your Cargo.toml]
-        │
-        ▼
-[Manifest Parser] ──► [Dependency List]
-                            │
-                ┌───────────┼───────────┐
-                ▼           ▼           ▼
-         [no_std Check] [WASM Check] [Float Check] ...
-                │           │           │
-                └───────────┼───────────┘
-                            ▼
-                  [Compatibility Score]
-                            │
-                            ▼
-                   [Report (CLI / JSON)]
+```sh
+cargo install stylus-registry --version 0.1.0-beta.1 --locked
+rustup target add wasm32-unknown-unknown
+stylus-registry check tiny-keccak --features keccak
 ```
 
-**Stylus constraints checked:**
-- `no_std` — Stylus contracts must not use the Rust standard library
-- `wasm32-unknown-unknown` — must compile to the WASM target
-- No floating-point — `f32`/`f64` opcodes are disallowed for determinism
-- No async runtimes — contracts execute synchronously in the Arbitrum VM
-- Binary size — compressed WASM must fit within 24KB (uncompressed < 128KB)
+Use a recent stable Rust toolchain. A prerelease version must be requested explicitly. Precompiled Linux, macOS and Windows executables are available in [GitHub Releases](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.1). They still need Cargo and the WASM target for compilation checks.
 
-## Tech Stack
+Cargo installs the executable, not the registry data. See the [installation guide](docs/usage.md) for the versioned data download, binary installation, and installation from GitHub.
 
-| Layer | Technology |
-|-------|-----------|
-| Language | Rust (stable) |
-| CLI | clap v4 (derive) |
-| Manifest Parsing | cargo_toml |
-| Registry Data | TOML files |
-| Output | Colored terminal tables, JSON |
-| Testing | cargo test (unit + integration) |
-| CI/CD | GitHub Actions |
+## What the beta does
 
-## Getting Started
+| Check | Evidence used |
+|---|---|
+| `no_std` | Curated registry flag, then a list of known std-dependent crates |
+| `wasm_target` | Attempts `cargo check --target wasm32-unknown-unknown` in a temporary project; also uses a blocklist |
+| `float_usage` | Curated flag, then a blocklist and optional source-text scan |
+| `async_usage` | Curated flag, then known runtime names |
+| `simd_usage` | A list of five crate names associated with SIMD |
 
-### Prerequisites
+The CLI analyzes individual crates, direct dependencies or a resolved transitive tree, and prints a readable report or JSON. Scores start at 100, subtract 30 for each error and 10 for each warning. The project score is its lowest crate score.
 
-- Rust stable (see `rust-toolchain.toml`)
-- cargo (comes with Rust)
+**Read the messages, not just the score.** Some unavailable checks currently fall back to `Pass`. A score of 100 is not proof of Stylus compatibility. Float/std classifications are project heuristics and curated assumptions, not an authoritative specification of the Stylus VM. See [known limitations and bugs](docs/limitations.md).
 
-### Setup
+## Use the registry
 
-```bash
-# Clone the repository
-git clone git@github.com:CoBuilders-xyz/stylus-compatibility-registry.git
+After extracting a release bundle, use its `data/` directory:
+
+```sh
+stylus-registry check tokio --data-dir data/
+stylus-registry check tiny-keccak --features keccak --data-dir data/
+stylus-registry check-deps --manifest path/to/Cargo.toml --data-dir data/ --json
+stylus-registry check-deps --manifest path/to/Cargo.toml --data-dir data/ --include-transitive
+stylus-registry check-deps --manifest path/to/Cargo.toml --data-dir data/ --strict
+```
+
+`--strict` exits with status 1 when the project report contains errors. Warnings alone do not fail it. The individual `check` command reports check failures without changing its exit status; use its JSON report when scripting.
+
+The beta includes 54 curated entries: 25 in `known-compatible.toml` and 29 in `known-incompatible.toml`. These names reflect the project's classifications, not 54 independently deployed and verified contracts. Registry lookup is by crate name and takes precedence over the std, float and async fallback checks.
+
+## Build and contribute
+
+```sh
+git clone https://github.com/CoBuilders-xyz/stylus-compatibility-registry.git
 cd stylus-compatibility-registry
-
-# Build the project
-cargo build
-```
-
-### Usage
-
-```bash
-# Check a single crate by name
-cargo run -- check tokio
-cargo run -- check tiny-keccak
-
-# Same, but consulting the curated registry instead of the built-in blocklists
-cargo run -- check tokio --data-dir data/
-
-# Analyze all dependencies in a Cargo.toml
-cargo run -- check-deps --manifest path/to/Cargo.toml --data-dir data/
-
-# Strict mode (exits with code 1 if any errors found — for CI)
-cargo run -- check-deps --manifest path/to/Cargo.toml --data-dir data/ --strict
-
-# JSON output (for programmatic consumption)
-cargo run -- check-deps --manifest path/to/Cargo.toml --json
-
-# Try it on the included test fixture
-cargo run -- check-deps --manifest fixtures/test-project/Cargo.toml --data-dir data/
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-cargo test
-
-# Run only core library tests
-cargo test -p stylus-compat-core
-
-# Run only integration tests
-cargo test -p stylus-compat-core --test check_no_std
-```
-
-### Linting & Formatting
-
-```bash
+cargo build --locked
+cargo run --locked -- check tiny-keccak --features keccak --data-dir data/
 cargo fmt --check
-cargo clippy -- -D warnings
+cargo clippy --locked -- -D warnings
+cargo test --locked
 ```
 
-## Project Structure
+The [mixed dependency fixture](fixtures/test-project/Cargo.toml) intentionally produces errors; `tiny-keccak` in that fixture has no hash feature configured. Use [the release smoke fixture](fixtures/release-smoke/Cargo.toml) for a passing example.
 
-```
-stylus-compatibility-registry/
-├── crates/
-│   ├── core/                    # Library: check logic + scoring
-│   │   ├── src/
-│   │   │   ├── checks/         # CrateCheck trait + implementations
-│   │   │   ├── manifest.rs     # Cargo.toml parser
-│   │   │   ├── registry.rs     # Known-crates TOML loader
-│   │   │   ├── score.rs        # Compatibility scoring algorithm
-│   │   │   └── types.rs        # Shared types (CrateInfo, CheckResult, etc.)
-│   │   └── tests/              # Integration tests
-│   └── cli/                    # Binary: user-facing CLI
-│       └── src/
-│           ├── main.rs         # Entrypoint
-│           └── commands/       # check, check-deps subcommands
-├── data/
-│   ├── known-compatible.toml   # Pre-verified Stylus-compatible crates
-│   └── known-incompatible.toml # Known incompatible crates with alternatives
-├── fixtures/
-│   └── test-project/           # Sample Cargo.toml for testing
-├── .github/                    # CI workflows + templates
-└── rust-toolchain.toml         # Pinned Rust toolchain
-```
+## Documentation package
 
-## Contributing
+- [Installation, usage and CI integration](docs/usage.md)
+- [Architecture and extension points](docs/architecture.md)
+- [Beta limitations and known issues](docs/limitations.md)
+- [Release process and crates.io publishing](docs/releases.md)
+- [Registry ecosystem and fellowship report](docs/fellowship-report.md)
+- [Contributing](CONTRIBUTING.md) and [changelog](CHANGELOG.md)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute, adding new checks, and the PR workflow.
+Binary size estimation, automatic alternative suggestions, a searchable web registry, and broader ecosystem coverage remain student project opportunities. See the [open issues](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues).
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). Source, registry data and documentation are public in this repository.
