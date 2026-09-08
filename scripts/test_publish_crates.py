@@ -29,6 +29,18 @@ class PublicationTests(unittest.TestCase):
 
     @patch.object(publish_crates, "existing_checksum", return_value=None)
     @patch.object(publish_crates.subprocess, "run")
+    def test_pr_preparation_checks_archives_without_registry_lookup_or_upload(self, run, lookup):
+        publish_crates.publish(prepare_only=True)
+        lookup.assert_not_called()
+        self.assertEqual(run.call_count, 1)
+        archive = self.root / "target/package" / f"{PACKAGES[1]}-0.1.0-beta.2.crate"
+        archive.unlink()
+        with self.assertRaises(FileNotFoundError):
+            publish_crates.publish(prepare_only=True)
+        lookup.assert_not_called()
+
+    @patch.object(publish_crates, "existing_checksum", return_value=None)
+    @patch.object(publish_crates.subprocess, "run")
     def test_dry_run_checks_both_packages_without_uploading(self, run, lookup):
         publish_crates.publish(dry_run=True)
         self.assertEqual(lookup.call_count, 2)

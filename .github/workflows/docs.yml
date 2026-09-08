@@ -1,0 +1,63 @@
+name: Docs
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['docs/**', 'scripts/docs.py', 'scripts/registry_report.py', '.github/workflows/docs.yml', 'Cargo.toml']
+  push:
+    branches: [main]
+    paths: ['docs/**', 'scripts/docs.py', 'scripts/registry_report.py', '.github/workflows/docs.yml', 'Cargo.toml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Validate and package documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check docs/site.js
+      - run: python scripts/registry_report.py --check
+      - run: python scripts/docs.py build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: documentation-site
+          path: target/docs-site
+          include-hidden-files: true
+          if-no-files-found: error
+      - uses: actions/upload-pages-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: target/docs-site
+
+  deploy:
+    name: Publish documentation
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - uses: actions/deploy-pages@v4
+        id: deployment

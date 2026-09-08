@@ -19,25 +19,18 @@ The CLI delegates compatibility decisions to the core. Output indentation and co
 
 ## Analysis flow
 
-```text
-check arguments ────────────────────────> CrateInfo
-                                                 |
-Cargo.toml -> parse declared dependencies         |
-           or resolve Cargo metadata tree -------+
-                                                 v
-             optional TOML registry -> name lookup
-                                                 |
-                                                 v
-                                    run_all_checks
-                      no_std / wasm / float / async / simd
-                                                 |
-                                                 v
-                                      per-crate score
-                                                 |
-                          project counts + minimum score
-                                                 |
-                                                 v
-                                          text or JSON
+```mermaid
+flowchart TD
+  A[Single-crate arguments] --> D[CrateInfo]
+  B[Cargo.toml direct dependencies] --> D
+  C[Cargo metadata transitive tree] --> D
+  D --> E[Five checks]
+  R[Optional TOML registry] --> E
+  E --> F[Results: severity and message]
+  F --> G[Crate score]
+  G --> H[Project counts and minimum score]
+  F --> I[Text or JSON output]
+  H --> I
 ```
 
 1. `check` constructs a single `CrateInfo` from arguments, including features and default-feature selection. `check-deps` calls `analyze_project_with_transitive`.
@@ -88,8 +81,8 @@ Unit tests cover parsing, registry behavior, precedence, check heuristics and sc
 
 The tag-driven release workflow validates versions and source ancestry, tests packages, builds four native targets, runs a real WASM smoke check on each runner, and packages the binary with registry data and documentation. Cargo's workspace packaging verifies the library and CLI before upload. The library is published before the dependent CLI. A GitHub prerelease is published with checksummed archives only after validation and crates.io publication succeed.
 
-## Extending the exercise
+## Adding a check
 
 Implement `CrateCheck`, add the module, and add its invocation to `run_all_checks`. If a new check uses registry evidence, define explicit precedence and fallback behavior and test both paths. Keep terminal presentation out of the core. Prefer evidence-backed entries with reproducible version/feature examples.
 
-The [contribution guide](../CONTRIBUTING.md) and [open issues](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues) provide student-sized follow-up work. The beta intentionally leaves feature-aware rules, stronger evidence states, final-WASM inspection and several user-facing commands unfinished.
+The [contribution guide](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/CONTRIBUTING.md) and [open issues](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues) describe how to propose and implement changes. The beta intentionally leaves feature-aware rules, stronger evidence states, final-WASM inspection and several user-facing commands unfinished.

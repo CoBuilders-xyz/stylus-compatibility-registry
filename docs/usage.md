@@ -120,6 +120,6 @@ Without `--include-transitive`, the tool parses declared dependencies. With it, 
 
 ## Use in another project's CI
 
-Copy [the GitHub Actions example](../.github/examples/stylus-check.yml) into that project's `.github/workflows/`. It installs a versioned CLI, downloads the matching registry data, installs the WASM target, and runs `check-deps --strict`. It works without publishing keys.
+Copy [the GitHub Actions example](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/.github/examples/stylus-check.yml) into that project's `.github/workflows/`. It installs a versioned CLI, downloads the matching registry data, installs the WASM target, and runs `check-deps --strict`. It works without publishing keys.
 
 Use this beta as advisory tooling where false positives or missed findings are acceptable. A passing job is not a replacement for building and validating the actual Stylus contract.

@@ -1,6 +1,6 @@
 # stylus-registry
 
-Experimental CLI from the CoBuilders Stylus Fellowship for reviewing Rust dependencies before building Arbitrum Stylus contracts.
+Experimental CLI for reviewing Rust dependencies before building Arbitrum Stylus contracts.
 
 ```sh
 cargo install stylus-registry --version 0.1.0-beta.2 --locked

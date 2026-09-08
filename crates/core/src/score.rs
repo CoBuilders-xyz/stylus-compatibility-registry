@@ -8,8 +8,7 @@ use crate::types::{CheckResult, CompatibilityScore, Severity};
 /// - Each Warning: -10 points
 /// - Minimum score is 0
 ///
-/// This is intentionally simple for the scaffold. Fellows can refine the weights
-/// and add per-check scoring (e.g., `no_std` failure is more severe than float warning).
+/// Weights depend on severity; individual checks do not have separate weights.
 pub fn compute_score(results: &[CheckResult]) -> CompatibilityScore {
     let mut score: i32 = 100;
 
