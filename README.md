@@ -71,6 +71,7 @@ The [mixed dependency fixture](fixtures/test-project/Cargo.toml) intentionally p
 - [Beta limitations and known issues](docs/limitations.md)
 - [Release process and crates.io publishing](docs/releases.md)
 - [Registry coverage report](docs/reports/2026-09-08/README.md)
+- [Fellowship outcomes](docs/fellowship-outcomes.md)
 - [Contributing](CONTRIBUTING.md) and [changelog](CHANGELOG.md)
 
 Binary size estimation, automatic alternative suggestions, a searchable web registry, and broader ecosystem coverage remain on the [roadmap](docs/roadmap.md). See the [open issues](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues).

@@ -35,6 +35,7 @@ The [roadmap](roadmap.md) describes planned improvements to evidence handling, r
 ## Release package
 
 - [Publication evidence](release.md)
+- [Fellowship outcomes](fellowship-outcomes.md)
 - [Release notes](release-notes.md)
 - [Validation and reproducibility](validation.md)
 - [Maintaining this site](publishing.md)

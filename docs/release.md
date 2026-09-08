@@ -17,6 +17,10 @@ The [GitHub prerelease](https://github.com/CoBuilders-xyz/stylus-compatibility-r
 | Source and license | Tagged public repository under the MIT license |
 | Documentation | Usage, architecture, check methodology, limitations and release operations |
 
+## Project outcomes
+
+[Fellowship outcomes](fellowship-outcomes.md) records the delivered capabilities, technical findings and development priorities for this release.
+
 ## Distribution evidence
 
 The [publication record](reports/2026-09-08/publication.json) lists the public URLs, release commit, workflow result and SHA-256 values captured from GitHub and crates.io. The five original archives contain four native executables and one standalone data package. Their published `SHA256SUMS` file remains unchanged.

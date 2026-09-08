@@ -11,6 +11,7 @@
   - [Roadmap](/roadmap.md)
 - **RELEASE**
   - [Publication evidence](/release.md)
+  - [Fellowship outcomes](/fellowship-outcomes.md)
   - [Release notes](/release-notes.md)
   - [Validation](/validation.md)
   - [Maintaining this site](/publishing.md)

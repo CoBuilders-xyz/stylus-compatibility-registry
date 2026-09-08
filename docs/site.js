@@ -66,6 +66,7 @@ window.$docsify = {
       '/limitations',
       '/reports/2026-09-08/README',
       '/roadmap',
+      '/fellowship-outcomes',
       '/release',
       '/release-notes',
       '/releases',
@@ -74,7 +75,7 @@ window.$docsify = {
     ],
     placeholder: 'Search documentation',
     noData: 'No matching pages. Try another term.',
-    namespace: 'stylus-registry-docs-v2',
+    namespace: 'stylus-registry-docs-v3',
     depth: 3,
   },
   plugins: [
