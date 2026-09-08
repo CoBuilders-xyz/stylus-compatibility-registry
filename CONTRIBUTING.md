@@ -90,7 +90,7 @@ Before pushing, ensure:
 
 ```bash
 cargo fmt --check    # Code is formatted
-cargo clippy -- -D warnings  # No lint warnings
+cargo clippy --locked -- -D warnings  # No lint warnings
 cargo test           # Tests pass
 cargo build          # Project builds
 ```
@@ -262,3 +262,9 @@ takes precedence over the blocklists and over the source scan. A wrong flag sile
 - Open an issue with the `question` label
 - Tag maintainers in PR comments for reviews
 - Check existing issues before creating new ones
+
+## Beta release and documentation
+
+Read [architecture](docs/architecture.md) before extending the pipeline and [limitations](docs/limitations.md) before making compatibility claims. Keep registry data and descriptions tied to reproducible evidence. The beta intentionally leaves several student-sized issues open.
+
+[Release preparation and publishing](docs/releases.md) documents versioning, package checks and the tag-driven workflow. Never commit publishing credentials. The publication workflow is exercised on PRs without uploading packages; actual publishing follows a versioned tag on `main`.

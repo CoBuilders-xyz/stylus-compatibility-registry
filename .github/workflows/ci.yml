@@ -35,7 +35,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - run: cargo clippy -- -D warnings
+      - run: cargo clippy --locked -- -D warnings
 
   test:
     name: Test
@@ -47,12 +47,12 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - run: cargo test
+      - run: cargo test --locked
 
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [fmt, clippy, test]
+    needs: [fmt, clippy, test, wasm]
     steps:
       - uses: actions/checkout@v5
 
@@ -60,4 +60,21 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - run: cargo build --release
+      - run: cargo build --release --locked
+
+  wasm:
+    name: Real WASM checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --locked -p stylus-compat-core compile_check_ -- --ignored
+      - run: cargo build --locked
+      - run: python scripts/smoke_test.py --binary target/debug/stylus-registry
