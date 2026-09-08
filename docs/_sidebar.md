@@ -1,0 +1,19 @@
+- **GET STARTED**
+  - [Documentation home](/)
+  - [Installation and usage](/usage.md)
+  - [Check methodology](/methodology.md)
+  - [Limitations and known issues](/limitations.md)
+- **TECHNICAL GUIDES**
+  - [Architecture](/architecture.md)
+  - [Release automation](/releases.md)
+- **REGISTRY & FELLOWSHIP**
+  - [Registry report · Sep 2026](/reports/2026-09-08/README.md)
+  - [Fellowship outcomes](/fellowship-outcomes.md)
+  - [Original beta report](/fellowship-report.md)
+- **RELEASE**
+  - [Deliverables & evidence](/release.md)
+  - [Release notes](/release-notes.md)
+  - [Validation](/validation.md)
+  - [Maintaining this site](/publishing.md)
+- [Download beta.2 ↗](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2)
+- [Source code ↗](https://github.com/CoBuilders-xyz/stylus-compatibility-registry)

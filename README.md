@@ -64,6 +64,8 @@ The [mixed dependency fixture](fixtures/test-project/Cargo.toml) intentionally p
 
 ## Documentation package
 
+[Browse the documentation site](https://cobuilders-xyz.github.io/stylus-compatibility-registry/) or start with the [documentation index](docs/README.md). The site includes methodology, a reproducible registry report and public release evidence.
+
 - [Installation, usage and CI integration](docs/usage.md)
 - [Architecture and extension points](docs/architecture.md)
 - [Beta limitations and known issues](docs/limitations.md)

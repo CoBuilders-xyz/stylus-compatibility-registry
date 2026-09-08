@@ -1,0 +1,100 @@
+{
+  "captured_on": "2026-09-08",
+  "cli_version": "stylus-registry 0.1.0-beta.2",
+  "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)",
+  "examples": [
+    {
+      "command": "stylus-registry check tiny-keccak --version 2.0.2 --features keccak --data-dir data/ --json",
+      "exit_code": 0,
+      "report": {
+        "crate_info": {
+          "name": "tiny-keccak",
+          "version": "2.0.2",
+          "features": [
+            "keccak"
+          ],
+          "default_features": true,
+          "is_transitive": false
+        },
+        "results": [
+          {
+            "check_name": "no_std",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is verified no_std compatible"
+          },
+          {
+            "check_name": "wasm_target",
+            "severity": "Pass",
+            "message": "`tiny-keccak` compiles for wasm32-unknown-unknown"
+          },
+          {
+            "check_name": "float_usage",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is verified free of floating-point usage"
+          },
+          {
+            "check_name": "async_usage",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is verified free of async runtimes"
+          },
+          {
+            "check_name": "simd_usage",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is not a known SIMD crate"
+          }
+        ],
+        "score": {
+          "value": 100,
+          "max": 100,
+          "label": "Excellent"
+        }
+      }
+    },
+    {
+      "command": "stylus-registry check tiny-keccak --version 2.0.2 --data-dir data/ --json",
+      "exit_code": 0,
+      "report": {
+        "crate_info": {
+          "name": "tiny-keccak",
+          "version": "2.0.2",
+          "features": [],
+          "default_features": true,
+          "is_transitive": false
+        },
+        "results": [
+          {
+            "check_name": "no_std",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is verified no_std compatible"
+          },
+          {
+            "check_name": "wasm_target",
+            "severity": "Error",
+            "message": "`tiny-keccak` failed wasm32-unknown-unknown compilation check:\nerror: You need to specify at least one hash function you intend to use. Available options:\nerror: could not compile `tiny-keccak` (build script) due to 1 previous error"
+          },
+          {
+            "check_name": "float_usage",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is verified free of floating-point usage"
+          },
+          {
+            "check_name": "async_usage",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is verified free of async runtimes"
+          },
+          {
+            "check_name": "simd_usage",
+            "severity": "Pass",
+            "message": "`tiny-keccak` is not a known SIMD crate"
+          }
+        ],
+        "score": {
+          "value": 70,
+          "max": 100,
+          "label": "Good"
+        }
+      }
+    }
+  ]
+}

@@ -54,7 +54,7 @@ git tag -a v0.1.0-beta.3 -m 'Stylus registry 0.1.0-beta.3'
 git push origin v0.1.0-beta.3
 ```
 
-Creating the tag is the deliberate version-selection step. Everything after the tag push is performed by [`.github/workflows/release.yml`](../.github/workflows/release.yml):
+Creating the tag is the deliberate version-selection step. Everything after the tag push is performed by [`.github/workflows/release.yml`](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/.github/workflows/release.yml):
 
 - Validate the tag, workspace/core versions, lockfile and changelog. The tagged commit must belong to `origin/main`.
 - Run formatting, Clippy, Rust tests, real WASM compilation tests, release-script tests and the publication script in dry-run mode, including package creation and existing-version checksum checks.

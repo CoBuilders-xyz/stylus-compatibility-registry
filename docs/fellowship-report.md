@@ -18,12 +18,12 @@ The project provides an executable starting point: a CLI, a reusable core librar
 
 | Output | Evidence |
 |---|---|
-| Open-source implementation and license | [Repository](https://github.com/CoBuilders-xyz/stylus-compatibility-registry), [MIT license](../LICENSE) |
+| Open-source implementation and license | [Repository](https://github.com/CoBuilders-xyz/stylus-compatibility-registry), [MIT license](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/LICENSE) |
 | Versioned public distribution | [Beta release](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2), [CLI crate](https://crates.io/crates/stylus-registry), [core crate](https://crates.io/crates/stylus-compat-core) |
 | Usage guidelines | [Installation, examples and CI integration](usage.md) |
 | Architecture | [Component responsibilities, evidence precedence and extension points](architecture.md) |
 | Transparent limitations | [Beta limitations and known issues](limitations.md) |
-| Repeatable publication | [Release process](releases.md), [release workflow](../.github/workflows/release.yml) |
+| Repeatable publication | [Release process](releases.md), [release workflow](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/v0.1.0-beta.2/.github/workflows/release.yml) |
 
 The release links identify the deliverable produced by the publication workflow. GitHub source archives alone are supplemented with four native executables, versioned data, checksums and the Cargo installation path.
 
@@ -36,7 +36,7 @@ The release links identify the deliverable produced by the publication workflow.
 - Text/JSON reports, per-crate and minimum project scores, and strict project exit codes.
 - A curated snapshot with **54 unique crate names**: 25 in the compatible file and 29 in the incompatible file.
 
-These counts describe registry records, not contracts deployed or independently verified on-chain. See [the data files](../data/) and [scoring/evidence rules](architecture.md).
+These counts describe registry records, not contracts deployed or independently verified on-chain. See [the data files](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/tree/v0.1.0-beta.2/data/) and [scoring/evidence rules](architecture.md).
 
 ## Evidence from repository development
 

@@ -1,0 +1,67 @@
+{
+  "captured_on": "2026-09-08",
+  "source_commit": "59460476068542e5cb9e1fef88a2c51f3a2b7003",
+  "release": {
+    "tag": "v0.1.0-beta.2",
+    "url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/tag/v0.1.0-beta.2",
+    "published_at": "2026-09-08T19:43:42Z",
+    "draft": false,
+    "prerelease": true
+  },
+  "workflow": {
+    "id": 34268848187,
+    "html_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/actions/runs/34268848187",
+    "head_sha": "59460476068542e5cb9e1fef88a2c51f3a2b7003",
+    "conclusion": "success",
+    "run_attempt": 2
+  },
+  "crates": [
+    {
+      "name": "stylus-compat-core",
+      "version": "0.1.0-beta.2",
+      "checksum": "769714f384be4b8445f40f1d8aeb59c8897208b39938af50bb96e0be3d65aa8a",
+      "yanked": false,
+      "api_url": "https://crates.io/api/v1/crates/stylus-compat-core/0.1.0-beta.2"
+    },
+    {
+      "name": "stylus-registry",
+      "version": "0.1.0-beta.2",
+      "checksum": "33ea28e7f1034a854fb4ca6f1216441a7ec9c7c9d522d6690541505b4320d246",
+      "yanked": false,
+      "api_url": "https://crates.io/api/v1/crates/stylus-registry/0.1.0-beta.2"
+    }
+  ],
+  "assets": [
+    {
+      "name": "SHA256SUMS",
+      "size": 606,
+      "browser_download_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/SHA256SUMS"
+    },
+    {
+      "name": "stylus-registry-data-v0.1.0-beta.2.tar.gz",
+      "size": 22096,
+      "browser_download_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/stylus-registry-data-v0.1.0-beta.2.tar.gz"
+    },
+    {
+      "name": "stylus-registry-v0.1.0-beta.2-aarch64-apple-darwin.tar.gz",
+      "size": 2636672,
+      "browser_download_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/stylus-registry-v0.1.0-beta.2-aarch64-apple-darwin.tar.gz"
+    },
+    {
+      "name": "stylus-registry-v0.1.0-beta.2-x86_64-apple-darwin.tar.gz",
+      "size": 2774403,
+      "browser_download_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/stylus-registry-v0.1.0-beta.2-x86_64-apple-darwin.tar.gz"
+    },
+    {
+      "name": "stylus-registry-v0.1.0-beta.2-x86_64-pc-windows-msvc.zip",
+      "size": 2532741,
+      "browser_download_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/stylus-registry-v0.1.0-beta.2-x86_64-pc-windows-msvc.zip"
+    },
+    {
+      "name": "stylus-registry-v0.1.0-beta.2-x86_64-unknown-linux-gnu.tar.gz",
+      "size": 2958624,
+      "browser_download_url": "https://github.com/CoBuilders-xyz/stylus-compatibility-registry/releases/download/v0.1.0-beta.2/stylus-registry-v0.1.0-beta.2-x86_64-unknown-linux-gnu.tar.gz"
+    }
+  ],
+  "archive_checksums": "808c49305af99ddd7fdb1428a4b5b35e353062b0e3f9ab44120f7cfe9be8e7ea  stylus-registry-data-v0.1.0-beta.2.tar.gz\n17fb0af9cafa98e74cc01afe30f0b3bfea8d6c96335d78179a16ef6f0614f2cf  stylus-registry-v0.1.0-beta.2-aarch64-apple-darwin.tar.gz\n43c464bed779edc8fafba4167b7756ebc29279015ec2acbb07f5b7995a9943c4  stylus-registry-v0.1.0-beta.2-x86_64-apple-darwin.tar.gz\n91774c3f0ff10b1e07dbc1054540a4f18942995fb45798a5f14d7b4a9c098901  stylus-registry-v0.1.0-beta.2-x86_64-pc-windows-msvc.zip\nfe73c6e012aaa653e09ccd9fab4c1d79b1f560493b82bbe6b64de0056ada1c97  stylus-registry-v0.1.0-beta.2-x86_64-unknown-linux-gnu.tar.gz\n"
+}
