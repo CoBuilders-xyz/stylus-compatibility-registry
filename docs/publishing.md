@@ -33,7 +33,7 @@ One-time repository configuration: set **Settings → Pages → Source → GitHu
 
 ## Attach the supplement to beta.2
 
-After the documentation PR is merged and the Docs workflow succeeds, download its `documentation-site` artifact. The `downloads/` directory contains `stylus-registry-docs-v0.1.0-beta.2.tar.gz` and `SHA256SUMS`. Its `BUILD-INFO.json` records both the documentation commit and the original beta commit.
+After the documentation PR is merged and the Docs workflow succeeds, download its `documentation-site` artifact. The `downloads/` directory contains `stylus-registry-docs-v0.1.0-beta.2.tar.gz` and `SHA256SUMS`. Its `BUILD-INFO.json` records both the documentation commit and the original beta commit. The supplement targets the published release recorded in the frozen publication evidence, independently of future workspace version bumps.
 
 A maintainer can attach this archive and its checksum as additional assets to the existing GitHub prerelease, naming them with the documentation commit to distinguish revisions. Add a documentation-site link to the release notes. Do not replace the original binaries, data bundle or original `SHA256SUMS`, and do not move the beta tag. Subsequent executable releases automatically include the expanded `docs/` directory through the existing release workflow.
 

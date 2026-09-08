@@ -8,7 +8,6 @@ import re
 import shutil
 import subprocess
 import tarfile
-import tomllib
 from urllib.parse import unquote, urlsplit
 
 from registry_report import serialized_metrics, REPORT
@@ -19,7 +18,9 @@ SITE = ROOT / 'target/docs-site'
 
 
 def version():
-    return tomllib.loads((ROOT / 'Cargo.toml').read_text(encoding='utf-8'))['workspace']['package']['version']
+    # The supplement targets an already published release, independently of
+    # a future workspace version bump whose tag may not exist yet.
+    return json.loads((REPORT / 'publication.json').read_text(encoding='utf-8'))['release']['tag'].removeprefix('v')
 
 
 def check():
@@ -66,7 +67,7 @@ def build():
         'documentation_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'documentation_dirty': bool(subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=normal'], cwd=ROOT, text=True).strip()),
         'release': f'v{version()}',
-        'release_commit': subprocess.check_output(['git', 'rev-parse', f'v{version()}^{{commit}}'], cwd=ROOT, text=True).strip(),
+        'release_commit': json.loads((REPORT / 'publication.json').read_text(encoding='utf-8'))['source_commit'],
     }
     provenance = ROOT / 'target/docs-build-info.json'
     provenance.write_text(json.dumps(info, indent=2) + '\n', encoding='utf-8')
