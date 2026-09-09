@@ -58,7 +58,7 @@ Serde provides JSON serialization. TOML parsing errors and filesystem errors pro
 | `float_usage` | `has_float=true` warns; false passes without a scan | Known float names warn; otherwise scan downloaded Rust source if a version was supplied |
 | `async_usage` | `has_async=true` is an error; false passes | Known async runtime names are errors |
 | `simd_usage` | Registry is not consulted | Known SIMD crate names warn; other names pass |
-| `allocator` | Registry is not consulted | Known global-allocator names are errors when `stylus-sdk` is in the tree with `mini-alloc` active, warnings otherwise; other names pass |
+| `allocator` | Registry is not consulted | Known allocator implementations produce advisory warnings; messages distinguish SDK mini-alloc enabled, disabled, absent and unavailable tree context. Names do not prove global registration; unlisted names pass this heuristic |
 
 Registry precedence is deliberate: adding a curated flag must change the result, and registry hits avoid unnecessary source downloads. It also places responsibility on data maintainers. A false flag is a positive override, not “unknown”. Records currently cannot express per-version or per-feature conditions.
 

@@ -51,3 +51,41 @@ fn falls_back_to_the_blocklists_without_a_data_dir() {
         "registry notes should not appear without a data dir, got:\n{out}"
     );
 }
+
+#[test]
+fn allocator_name_warning_does_not_fail_strict_mode() {
+    let root = data_dir().parent().unwrap().to_path_buf();
+    let output = Command::new(env!("CARGO_BIN_EXE_stylus-registry"))
+        .args(["check-deps", "--strict", "--json", "--manifest"])
+        .arg(root.join("fixtures/allocator-advisory/Cargo.toml"))
+        .arg("--data-dir")
+        .arg(data_dir())
+        // Isolate allocator classification from the compilation check. The fixture
+        // also supports a separate real cargo build for wasm32-unknown-unknown.
+        .env("STYLUS_COMPAT_CARGO", "stylus-compat-no-such-cargo")
+        .output()
+        .expect("the CLI binary should run");
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["error_count"], 0);
+    let allocator = report["crate_reports"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|r| r["crate_info"]["name"] == "wee_alloc")
+        .unwrap()["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|r| r["check_name"] == "allocator")
+        .unwrap();
+    assert_eq!(allocator["severity"], "Warning");
+    assert!(allocator["message"]
+        .as_str()
+        .unwrap()
+        .contains("may conflict"));
+}
