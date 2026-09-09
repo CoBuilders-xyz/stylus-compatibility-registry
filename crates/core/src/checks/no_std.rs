@@ -53,11 +53,7 @@ impl NoStdCheck {
             if entry.requires_std {
                 return CheckResult::error(
                     self.name(),
-                    format!(
-                        "`{}` requires std: {}",
-                        crate_info.name,
-                        entry.notes.as_deref().unwrap_or("no details")
-                    ),
+                    format!("`{}` requires std{}", crate_info.name, entry.note_suffix()),
                 );
             }
             return CheckResult::pass(
@@ -122,6 +118,32 @@ mod tests {
         };
         let result = NoStdCheck.check_against_registry(&info, Some(&entry));
         assert_eq!(result.severity, crate::types::Severity::Error);
+        assert_eq!(
+            result.message,
+            "`serde_json` requires std. Registry note: Uses std::io for formatting"
+        );
+    }
+
+    #[test]
+    fn omits_the_note_when_the_entry_has_none() {
+        let info = CrateInfo {
+            name: "serde_json".to_string(),
+            version: Some("1.0.0".to_string()),
+            features: vec![],
+            default_features: true,
+            is_transitive: false,
+        };
+        let entry = KnownCrateEntry {
+            name: "serde_json".to_string(),
+            requires_std: true,
+            has_float: false,
+            has_async: false,
+            max_version: None,
+            alternative: None,
+            notes: None,
+        };
+        let result = NoStdCheck.check_against_registry(&info, Some(&entry));
+        assert_eq!(result.message, "`serde_json` requires std");
     }
 
     #[test]
