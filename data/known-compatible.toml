@@ -199,7 +199,7 @@ name = "openzeppelin-stylus"
 requires_std = false
 has_float = false
 has_async = false
-notes = "OpenZeppelin contracts for Stylus (ERC20, ERC721, ERC1155, access control, proxies). Requires nightly toolchain and -Z build-std"
+notes = "OpenZeppelin contracts for Stylus (ERC20, ERC721, ERC1155, access control, proxies)."
 
 [[crate]]
 name = "openzeppelin-stylus-proc"
