@@ -193,3 +193,24 @@ requires_std = false
 has_float = false
 has_async = false
 notes = "Compile-time assertions — zero runtime cost"
+
+[[crate]]
+name = "openzeppelin-stylus"
+requires_std = false
+has_float = false
+has_async = false
+notes = "OpenZeppelin contracts for Stylus (ERC20, ERC721, ERC1155, access control, proxies)."
+
+[[crate]]
+name = "openzeppelin-stylus-proc"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Proc-macro crate used internally by openzeppelin-stylus"
+
+[[crate]]
+name = "openzeppelin-crypto"
+requires_std = false
+has_float = false
+has_async = false
+notes = "Crypto primitives for Stylus (Merkle proofs, Pedersen, EdDSA, Poseidon). Usable standalone or via openzeppelin-stylus"
