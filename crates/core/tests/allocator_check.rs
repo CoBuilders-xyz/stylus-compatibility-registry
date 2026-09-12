@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::process::Command;
 use stylus_compat_core::types::Severity;
 
 fn fixtures_dir() -> PathBuf {
@@ -51,4 +52,29 @@ fn reports_an_advisory_when_the_project_also_pulls_the_sdk() {
         .contains("no dependency tree was inspected"));
     assert_eq!(severity_of("dlmalloc"), Severity::Pass);
     assert_eq!(severity_of("tiny-keccak"), Severity::Pass);
+}
+
+/// The advisory severity rests on this build being valid. Depending on `wee_alloc`
+/// next to the SDK's mini-alloc is not a duplicate registration, and if that ever
+/// stops holding the check should go back to reporting an error.
+#[test]
+#[ignore = "requires network access and the wasm32-unknown-unknown target"]
+fn the_advisory_fixture_builds_for_wasm32() {
+    let manifest = fixtures_dir().join("allocator-advisory/Cargo.toml");
+    let output = Command::new(env!("CARGO"))
+        .args([
+            "build",
+            "--target",
+            "wasm32-unknown-unknown",
+            "--manifest-path",
+        ])
+        .arg(&manifest)
+        .output()
+        .expect("cargo should run");
+
+    assert!(
+        output.status.success(),
+        "wee_alloc and stylus-sdk should build together:\n{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 }
