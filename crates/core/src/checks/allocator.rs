@@ -29,10 +29,7 @@ impl AllocatorCheck {
         if !ALLOCATOR_CRATES.contains(&crate_info.name.as_str()) {
             return CheckResult::pass(
                 self.name(),
-                format!(
-                    "`{}` is not flagged by the allocator name check",
-                    crate_info.name
-                ),
+                format!("`{}` is not a known allocator crate", crate_info.name),
             );
         }
 
@@ -154,9 +151,7 @@ mod tests {
         for name in ["dlmalloc", "mini-alloc", "stylus-sdk"] {
             let result = AllocatorCheck.check_in_tree(&crate_info(name), Some(&tree));
             assert_eq!(result.severity, Severity::Pass, "{name} should pass");
-            assert!(result
-                .message
-                .contains("not flagged by the allocator name check"));
+            assert!(result.message.contains("is not a known allocator crate"));
         }
     }
 
