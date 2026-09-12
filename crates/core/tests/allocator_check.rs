@@ -64,6 +64,7 @@ fn the_advisory_fixture_builds_for_wasm32() {
     let output = Command::new(env!("CARGO"))
         .args([
             "build",
+            "--locked",
             "--target",
             "wasm32-unknown-unknown",
             "--manifest-path",
