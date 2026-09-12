@@ -48,7 +48,8 @@ pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
         registry.load_data_dir(dir)?;
     }
 
-    let results = run_all_checks(&crate_info, registry.lookup(&crate_info.name));
+    // A single crate name has no dependency tree, so the allocator check gets None.
+    let results = run_all_checks(&crate_info, registry.lookup(&crate_info.name), None);
     let score = compute_score(&results);
 
     if args.json {
