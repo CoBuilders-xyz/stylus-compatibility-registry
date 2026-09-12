@@ -1,14 +1,18 @@
 use crate::checks::CrateCheck;
 use crate::types::{CheckResult, CrateInfo};
-use std::fs;
+use std::fs::{self, File};
 use std::io;
 use std::path::Path;
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 use std::time::Duration;
 use tempfile::TempDir;
 use wait_timeout::ChildExt;
 
 const CARGO_TIMEOUT: Duration = Duration::from_secs(120);
+
+/// Diagnostic lines kept in a report before it stops being readable. Caps both the
+/// error list and the raw tail shown when no error line was recognised.
+const MAX_REPORTED_LINES: usize = 10;
 
 /// Checks whether a crate compiles for the `wasm32-unknown-unknown` target.
 ///
@@ -159,17 +163,33 @@ fn extract_compiler_errors(output: &str) -> String {
         .collect();
 
     if errors.is_empty() {
-        output
+        return output
             .lines()
             .rev()
-            .take(10)
+            .take(MAX_REPORTED_LINES)
             .collect::<Vec<_>>()
             .into_iter()
             .rev()
             .collect::<Vec<_>>()
-            .join("\n")
+            .join("\n");
+    }
+
+    let head = errors
+        .iter()
+        .take(MAX_REPORTED_LINES)
+        .copied()
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    // A crate like packed_simd repeats the same few codes hundreds of times, and the
+    // whole list buries the report it is printed into.
+    if errors.len() > MAX_REPORTED_LINES {
+        format!(
+            "{head}\n... and {} more errors",
+            errors.len() - MAX_REPORTED_LINES
+        )
     } else {
-        errors.join("\n")
+        head
     }
 }
 
@@ -210,25 +230,36 @@ pub fn compile_check_with_cargo(crate_info: &CrateInfo, cargo: &str) -> CompileC
         return CompileCheckOutcome::Unavailable;
     }
 
+    // cargo writes to files, not pipes. Nothing drains a pipe while wait_timeout
+    // blocks, so a build noisy enough to fill the pipe buffer used to stall until
+    // the timeout and get reported as a check that could not run.
+    let stdout_path = temp_dir.path().join("cargo-stdout.log");
+    let stderr_path = temp_dir.path().join("cargo-stderr.log");
+    let (stdout, stderr) = match (File::create(&stdout_path), File::create(&stderr_path)) {
+        (Ok(out), Ok(err)) => (out, err),
+        _ => return CompileCheckOutcome::Unavailable,
+    };
+
     let mut child = match Command::new(cargo)
         .args(["check", "--target", "wasm32-unknown-unknown", "--quiet"])
         .current_dir(temp_dir.path())
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
+        .stdout(Stdio::from(stdout))
+        .stderr(Stdio::from(stderr))
         .spawn()
     {
         Ok(child) => child,
-        Err(err) if err.kind() == io::ErrorKind::NotFound => {
-            return CompileCheckOutcome::Unavailable;
-        }
         Err(_) => return CompileCheckOutcome::Unavailable,
     };
 
     match child.wait_timeout(CARGO_TIMEOUT) {
-        Ok(Some(_status)) => match child.wait_with_output() {
-            Ok(output) => classify_output(&crate_info.name, &output),
-            Err(_) => CompileCheckOutcome::Unavailable,
-        },
+        Ok(Some(status)) => classify_output(
+            &crate_info.name,
+            &Output {
+                status,
+                stdout: fs::read(&stdout_path).unwrap_or_default(),
+                stderr: fs::read(&stderr_path).unwrap_or_default(),
+            },
+        ),
         Ok(None) => {
             let _ = child.kill();
             let _ = child.wait();
@@ -376,6 +407,54 @@ mod tests {
         let result = WasmTargetCheck.run_with_cargo(&info, "/nonexistent/cargo");
         assert_eq!(result.severity, Severity::Pass);
         assert!(result.message.contains("blocklist"));
+    }
+
+    #[test]
+    fn reports_every_error_under_the_cap() {
+        let output = "error[E0001]: one\nerror[E0002]: two";
+        assert_eq!(extract_compiler_errors(output), output);
+    }
+
+    #[test]
+    fn caps_the_reported_compiler_errors() {
+        let output = (0..25)
+            .map(|n| format!("error[E0512]: failure {n}"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let extracted = extract_compiler_errors(&output);
+        assert_eq!(extracted.lines().count(), MAX_REPORTED_LINES + 1);
+        assert!(extracted.ends_with("... and 15 more errors"));
+    }
+
+    /// A pipe buffer holds about 64 KB. Output past that used to stall the child
+    /// until the timeout, which surfaced as a passing check instead of a failure.
+    #[cfg(unix)]
+    #[test]
+    fn classifies_a_failure_that_outgrows_the_pipe_buffer() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = TempDir::new().unwrap();
+        let fake_cargo = dir.path().join("cargo");
+        fs::write(
+            &fake_cargo,
+            "#!/bin/sh\nawk 'BEGIN { while (n++ < 5000) \
+             print \"error[E0557]: feature has been removed\" }' >&2\nexit 1\n",
+        )
+        .unwrap();
+        fs::set_permissions(&fake_cargo, fs::Permissions::from_mode(0o755)).unwrap();
+
+        let info = CrateInfo {
+            name: "noisy-crate".to_string(),
+            version: Some("0.3.9".to_string()),
+            features: vec![],
+            default_features: true,
+            is_transitive: false,
+        };
+
+        match compile_check_with_cargo(&info, fake_cargo.to_str().unwrap()) {
+            CompileCheckOutcome::Error(errors) => assert!(errors.contains("E0557")),
+            other => panic!("a failing build should be an error, got {other:?}"),
+        }
     }
 
     #[test]
