@@ -1,23 +1,16 @@
 use crate::checks::CrateCheck;
 use crate::types::{CheckResult, CrateInfo};
 
-/// Checks for crates that register their own `#[global_allocator]`.
+/// Flags allocator dependencies that may be registered with `#[global_allocator]`.
 ///
-/// `stylus-sdk` ships `default = ["mini-alloc"]` and registers a global allocator on
-/// wasm32. Rust allows one per binary, so a second one is a compile error rather than
-/// anything the Stylus VM rejects at activation.
-///
-/// Only crate names are matched, and a name in the tree is not proof that someone wrote
-/// the attribute. That is why the verdict drops to a warning when `stylus-sdk` is not
-/// there to collide with.
+/// Crate names do not establish whether an allocator is registered by the project.
+/// Results are advisory even when stylus-sdk has mini-alloc enabled: an actual
+/// duplicate registration must be established from code or a build diagnostic.
 pub struct AllocatorCheck;
 
-/// Allocators that build for wasm32 and fail only on the duplicate registration.
-///
-/// `dlmalloc` is deliberately absent: it is what `wasm32-unknown-unknown` uses by
-/// default through std, so it sits in every normal tree. `mini-alloc` is absent for the
-/// same reason, it is the one the SDK already uses.
-const CONFLICTING_ALLOCATORS: &[&str] = &["wee_alloc", "talc", "lol_alloc"];
+/// Allocator implementations to flag for review, not confirmed registrations.
+/// The SDK's own mini-alloc and std's dlmalloc are not flagged by this heuristic.
+const ALLOCATOR_CRATES: &[&str] = &["wee_alloc", "talc", "lol_alloc"];
 
 impl CrateCheck for AllocatorCheck {
     fn name(&self) -> &str {
@@ -33,35 +26,49 @@ impl AllocatorCheck {
     /// `deps` is the project's dependency tree, or `None` when a single crate name was
     /// checked and there is no tree to look at.
     pub fn check_in_tree(&self, crate_info: &CrateInfo, deps: Option<&[CrateInfo]>) -> CheckResult {
-        if !CONFLICTING_ALLOCATORS.contains(&crate_info.name.as_str()) {
+        if !ALLOCATOR_CRATES.contains(&crate_info.name.as_str()) {
             return CheckResult::pass(
                 self.name(),
-                format!("`{}` does not register a global allocator", crate_info.name),
+                format!(
+                    "`{}` is not flagged as a conflicting allocator",
+                    crate_info.name
+                ),
             );
         }
 
         match deps {
-            Some(deps) if sdk_registers_mini_alloc(deps) => CheckResult::error(
+            Some(deps) if sdk_registers_mini_alloc(deps) => CheckResult::warning(
                 self.name(),
                 format!(
-                    "`{}` registers a global allocator and stylus-sdk already registers \
-                     mini-alloc; Rust allows only one per binary",
+                    "`{}` provides an allocator; registering it with #[global_allocator] may \
+                     conflict with stylus-sdk's mini-alloc; registration was not inspected",
                     crate_info.name
                 ),
             ),
+            Some(deps) if deps.iter().any(|dep| dep.name == "stylus-sdk") => {
+                CheckResult::warning(
+                    self.name(),
+                    format!(
+                        "`{}` provides an allocator; stylus-sdk has mini-alloc disabled in \
+                         the inspected dependencies; global allocator registration was not inspected",
+                        crate_info.name
+                    ),
+                )
+            }
             Some(_) => CheckResult::warning(
                 self.name(),
                 format!(
-                    "`{}` registers a global allocator; stylus-sdk was not found in the \
-                     dependency tree",
+                    "`{}` provides an allocator; stylus-sdk was not found in the \
+                     inspected dependencies; global allocator registration was not inspected",
                     crate_info.name
                 ),
             ),
             None => CheckResult::warning(
                 self.name(),
                 format!(
-                    "`{}` registers a global allocator; no dependency tree was inspected, \
-                     so a conflict with stylus-sdk's mini-alloc is possible",
+                    "`{}` provides an allocator; no dependency tree was inspected, \
+                     so a conflict with stylus-sdk's mini-alloc is possible if registered \
+                     with #[global_allocator]",
                     crate_info.name
                 ),
             ),
@@ -100,18 +107,19 @@ mod tests {
     }
 
     #[test]
-    fn errors_when_sdk_pulls_mini_alloc_by_default() {
+    fn warns_when_sdk_pulls_mini_alloc_by_default() {
         let tree = [sdk(true, &[]), crate_info("wee_alloc")];
         let result = AllocatorCheck.check_in_tree(&crate_info("wee_alloc"), Some(&tree));
-        assert_eq!(result.severity, Severity::Error);
-        assert!(result.message.contains("only one per binary"));
+        assert_eq!(result.severity, Severity::Warning);
+        assert!(result.message.contains("may conflict"));
+        assert!(result.message.contains("registration was not inspected"));
     }
 
     #[test]
-    fn errors_when_sdk_opts_into_mini_alloc_explicitly() {
+    fn warns_when_sdk_opts_into_mini_alloc_explicitly() {
         let tree = [sdk(false, &["mini-alloc"]), crate_info("talc")];
         let result = AllocatorCheck.check_in_tree(&crate_info("talc"), Some(&tree));
-        assert_eq!(result.severity, Severity::Error);
+        assert_eq!(result.severity, Severity::Warning);
     }
 
     #[test]
@@ -119,6 +127,8 @@ mod tests {
         let tree = [sdk(false, &["export-abi"]), crate_info("wee_alloc")];
         let result = AllocatorCheck.check_in_tree(&crate_info("wee_alloc"), Some(&tree));
         assert_eq!(result.severity, Severity::Warning);
+        assert!(result.message.contains("mini-alloc disabled"));
+        assert!(!result.message.contains("not found"));
     }
 
     #[test]
@@ -126,7 +136,9 @@ mod tests {
         let tree = [crate_info("serde"), crate_info("lol_alloc")];
         let result = AllocatorCheck.check_in_tree(&crate_info("lol_alloc"), Some(&tree));
         assert_eq!(result.severity, Severity::Warning);
-        assert!(result.message.contains("not found in the dependency tree"));
+        assert!(result
+            .message
+            .contains("not found in the inspected dependencies"));
     }
 
     #[test]
@@ -137,11 +149,14 @@ mod tests {
     }
 
     #[test]
-    fn passes_allocators_that_do_not_conflict() {
+    fn does_not_flag_standard_allocator_dependencies() {
         let tree = [sdk(true, &[])];
-        for name in ["dlmalloc", "mini-alloc"] {
+        for name in ["dlmalloc", "mini-alloc", "stylus-sdk"] {
             let result = AllocatorCheck.check_in_tree(&crate_info(name), Some(&tree));
             assert_eq!(result.severity, Severity::Pass, "{name} should pass");
+            assert!(result
+                .message
+                .contains("is not flagged as a conflicting allocator"));
         }
     }
 
