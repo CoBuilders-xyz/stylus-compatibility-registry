@@ -21,14 +21,16 @@ name = "alloy-primitives"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Ethereum primitive types (Address, U256, B256). Use default-features = false"
+requires_no_default_features = true
+notes = "Ethereum primitive types (Address, U256, B256)"
 
 [[crate]]
 name = "alloy-sol-types"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Solidity type encoding/decoding. Use default-features = false"
+requires_no_default_features = true
+notes = "Solidity type encoding/decoding"
 
 # --- Cryptography ---
 
@@ -44,28 +46,32 @@ name = "sha2"
 requires_std = false
 has_float = false
 has_async = false
-notes = "SHA-256/SHA-512. Use default-features = false"
+requires_no_default_features = true
+notes = "SHA-256/SHA-512"
 
 [[crate]]
 name = "sha3"
 requires_std = false
 has_float = false
 has_async = false
-notes = "SHA-3/Keccak. Use default-features = false"
+requires_no_default_features = true
+notes = "SHA-3/Keccak"
 
 [[crate]]
 name = "k256"
 requires_std = false
 has_float = false
 has_async = false
-notes = "secp256k1 curve operations. Use default-features = false"
+requires_no_default_features = true
+notes = "secp256k1 curve operations"
 
 [[crate]]
 name = "p256"
 requires_std = false
 has_float = false
 has_async = false
-notes = "NIST P-256 curve. Use default-features = false"
+requires_no_default_features = true
+notes = "NIST P-256 curve"
 
 # --- Serialization ---
 
@@ -74,7 +80,8 @@ name = "serde"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Use default-features = false, features = [\"derive\"]"
+requires_no_default_features = true
+notes = "Needs features = [\"derive\"]"
 
 [[crate]]
 name = "serde-json-core"
@@ -88,7 +95,8 @@ name = "borsh"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Binary serialization. Use default-features = false"
+requires_no_default_features = true
+notes = "Binary serialization"
 
 [[crate]]
 name = "ciborium"
@@ -139,7 +147,8 @@ name = "smallvec"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Stack-allocated small vectors. Use default-features = false"
+requires_no_default_features = true
+notes = "Stack-allocated small vectors"
 
 # --- Encoding ---
 
@@ -148,21 +157,24 @@ name = "hex"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Hex encoding/decoding. Use default-features = false"
+requires_no_default_features = true
+notes = "Hex encoding/decoding"
 
 [[crate]]
 name = "base64"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Base64 encoding. Use default-features = false"
+requires_no_default_features = true
+notes = "Base64 encoding"
 
 [[crate]]
 name = "bs58"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Base58 encoding. Use default-features = false"
+requires_no_default_features = true
+notes = "Base58 encoding"
 
 # --- Utilities ---
 
@@ -171,7 +183,8 @@ name = "bytes"
 requires_std = false
 has_float = false
 has_async = false
-notes = "Byte buffer utilities. Use default-features = false"
+requires_no_default_features = true
+notes = "Byte buffer utilities"
 
 [[crate]]
 name = "bitflags"

@@ -12,7 +12,7 @@ The registry matches **names only**. It cannot express a different rule for each
 
 | Check | What is inspected | What remains untested |
 |---|---|---|
-| `no_std` | Registry `requires_std`, then known std-dependent names | Full source analysis and the final contract's runtime requirements |
+| `no_std` | Registry `requires_std`, then `requires_no_default_features` against the declared default-feature setting, then known std-dependent names | Full source analysis and the final contract's runtime requirements |
 | `wasm_target` | A blocklist, then `cargo check` for a minimal dependency project targeting `wasm32-unknown-unknown` | Contract linking, activation, execution, size and gas |
 | `float_usage` | Registry `has_float`, then known names and optionally downloaded Rust source text | Active feature expressions and emitted WASM instructions |
 | `async_usage` | Registry `has_async`, then known runtime names | Complete runtime/async behavior |
