@@ -93,6 +93,7 @@ mod tests {
             requires_std: true,
             has_float: false,
             has_async,
+            requires_no_default_features: false,
             max_version: None,
             alternative: None,
             notes: Some("async web framework".to_string()),
