@@ -33,15 +33,18 @@ pub struct CheckArgs {
 }
 
 /// clap splits on commas but keeps the surrounding spaces, so `--features "a, b"`
-/// arrives as `[" b"]`. Trim first, then reject what cargo could not accept, rather
+/// arrives as `["a", " b"]`. Trim first, then reject what cargo could not accept, rather
 /// than letting an unusable name reach the checks.
 fn parse_features(raw: Vec<String>) -> Result<Vec<String>, String> {
     let mut features = Vec::with_capacity(raw.len());
     for value in raw {
         let trimmed = value.trim();
+        if trimmed.is_empty() {
+            return Err("empty feature name: drop the stray comma".to_string());
+        }
         if !is_valid_feature_name(trimmed) {
             return Err(format!(
-                "invalid feature name `{value}`: use letters, digits, `-`, `_` or `/`"
+                "invalid feature name `{trimmed}`: use letters, digits, `-` or `_`"
             ));
         }
         features.push(trimmed.to_string());

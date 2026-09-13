@@ -10,13 +10,14 @@ pub struct CrateInfo {
     pub is_transitive: bool,
 }
 
-/// Feature names safe to interpolate into a generated `Cargo.toml`. The slash covers
-/// the `dep/feature` form cargo accepts.
+/// Feature names safe to interpolate into a generated `Cargo.toml`. Slashes are out:
+/// the `dep/feature` form belongs in a `[features]` table, and cargo refuses it inside
+/// a dependency's own `features` list, which is where these end up.
 pub fn is_valid_feature_name(feature: &str) -> bool {
     !feature.is_empty()
         && feature
             .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '/')
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -120,21 +121,21 @@ mod tests {
 
     #[test]
     fn accepts_the_names_cargo_uses() {
-        for name in [
-            "keccak",
-            "sha3",
-            "std",
-            "rt-multi-thread",
-            "serde/derive",
-            "x86_64",
-        ] {
+        for name in ["keccak", "sha3", "std", "rt-multi-thread", "x86_64"] {
             assert!(is_valid_feature_name(name), "{name} should be valid");
         }
     }
 
     #[test]
     fn rejects_names_that_would_reach_the_generated_manifest() {
-        for name in ["", " sha3", "not.valid", "a\"]\nevil = \"1", "a b"] {
+        for name in [
+            "",
+            " sha3",
+            "not.valid",
+            "serde/derive",
+            "a\"]\nevil = \"1",
+            "a b",
+        ] {
             assert!(!is_valid_feature_name(name), "{name:?} should be rejected");
         }
     }

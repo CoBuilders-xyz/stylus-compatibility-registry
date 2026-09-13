@@ -120,4 +120,20 @@ fn accepts_repeated_feature_flags_and_no_default_features() {
 fn rejects_an_empty_feature_left_by_a_trailing_comma() {
     let output = run_raw(&["check", "tiny-keccak", "--features", "keccak,"]);
     assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("empty feature name"), "got: {stderr}");
+}
+
+/// cargo refuses `dep/feature` inside a dependency's own features list, so accepting it
+/// here produced a manifest cargo could not parse and scored the crate as incompatible.
+#[test]
+fn rejects_the_dep_slash_feature_form() {
+    let output = run_raw(&["check", "tiny-keccak", "--features", "serde/derive"]);
+
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("invalid feature name `serde/derive`"),
+        "got: {stderr}"
+    );
 }

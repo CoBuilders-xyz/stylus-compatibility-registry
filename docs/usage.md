@@ -83,7 +83,7 @@ stylus-registry check tiny-keccak --version 2.0.2 --features keccak --data-dir d
 stylus-registry check tiny-keccak --features keccak,sha3
 ```
 
-Features can also be repeated: `--features keccak --features sha3`. Do not insert whitespace around comma-separated feature names in this beta; see issue #45 in the limitations guide.
+Features can also be repeated: `--features keccak --features sha3`. Whitespace around comma-separated names is trimmed, so `--features 'keccak, sha3'` works. A name outside letters, digits, `-` and `_` is rejected before any check runs, with a nonzero exit status.
 
 `--version` selects the dependency version; root-level `stylus-registry --version` prints the tool version. Without a dependency version, Cargo resolves an available version and the source float scan does not run. Registry lookup is not version-aware. Use a plain version such as `0.4.3` in these beta examples. Cargo interprets this as a compatible version requirement, not an exact pin; the checker does not faithfully enforce every version expression.
 
