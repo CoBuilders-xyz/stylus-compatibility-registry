@@ -175,7 +175,7 @@ mod tests {
             requires_no_default_features: false,
             max_version: None,
             alternative: None,
-            notes: Some("Use default-features = false".to_string()),
+            notes: Some("Serialization framework".to_string()),
         };
         let result = NoStdCheck.check_against_registry(&info, Some(&entry));
         assert_eq!(result.severity, crate::types::Severity::Pass);

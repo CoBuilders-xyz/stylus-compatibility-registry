@@ -81,7 +81,7 @@ requires_std = false
 has_float = false
 has_async = false
 requires_no_default_features = true
-notes = "Needs features = [\"derive\"]"
+notes = "Serialization framework; the derive macros sit behind the derive feature"
 
 [[crate]]
 name = "serde-json-core"
@@ -103,6 +103,7 @@ name = "ciborium"
 requires_std = false
 has_float = false
 has_async = false
+requires_no_default_features = true
 notes = "CBOR encoding/decoding for no_std"
 
 # --- Math & Data Structures ---
@@ -112,6 +113,7 @@ name = "ruint"
 requires_std = false
 has_float = false
 has_async = false
+requires_no_default_features = true
 notes = "Fixed-size unsigned integers (U256, etc.)"
 
 [[crate]]
@@ -126,6 +128,7 @@ name = "uint"
 requires_std = false
 has_float = false
 has_async = false
+requires_no_default_features = true
 notes = "256-bit and other large integers"
 
 [[crate]]
@@ -133,6 +136,7 @@ name = "arrayvec"
 requires_std = false
 has_float = false
 has_async = false
+requires_no_default_features = true
 notes = "Fixed-capacity Vec alternative for no_std"
 
 [[crate]]
@@ -147,7 +151,6 @@ name = "smallvec"
 requires_std = false
 has_float = false
 has_async = false
-requires_no_default_features = true
 notes = "Stack-allocated small vectors"
 
 # --- Encoding ---

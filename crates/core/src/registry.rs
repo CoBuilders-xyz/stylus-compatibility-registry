@@ -14,6 +14,7 @@ pub enum RegistryError {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct KnownCrateEntry {
     pub name: String,
     pub requires_std: bool,
@@ -208,6 +209,28 @@ has_async = false
                 .unwrap()
                 .requires_no_default_features
         );
+    }
+
+    #[test]
+    fn rejects_a_misspelled_field() {
+        let mut file = NamedTempFile::new().unwrap();
+        write!(
+            file,
+            r#"
+[[crate]]
+name = "hex"
+requires_std = false
+has_float = false
+has_async = false
+requires_no_default_feature = true
+"#
+        )
+        .unwrap();
+
+        let err = KnownCratesRegistry::new()
+            .load_file(file.path())
+            .unwrap_err();
+        assert!(matches!(err, RegistryError::ParseError(_)));
     }
 
     #[test]
