@@ -19,7 +19,6 @@ For actual SDK and execution requirements, consult [Arbitrum's Stylus documentat
 | Issue | Behavior | Workaround |
 |---|---|---|
 | [#35](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues/35) | Large compiler output can fill a pipe, cause the 120-second timeout and then return a passing fallback | Treat a slow fallback as inconclusive; run the dependency/contract compilation directly |
-| [#45](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/issues/45) | Some rejected feature strings silently skip compilation and can score 100 | Use valid feature names, comma-separated without spaces or repeated flags; verify the result explicitly says it compiled |
 | Registry path handling | A missing directory or one without the expected TOML filenames is treated as an empty registry | Check the extracted files and pass the correct directory; verify registry notes appear |
 
 These are known limitations, not successful compatibility validations. Do not deploy solely on the tool's score.

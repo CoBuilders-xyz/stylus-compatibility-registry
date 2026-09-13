@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use stylus_compat_core::checks::run_all_checks;
 use stylus_compat_core::registry::KnownCratesRegistry;
 use stylus_compat_core::score::compute_score;
-use stylus_compat_core::types::{CrateInfo, Severity};
+use stylus_compat_core::types::{is_valid_feature_name, CrateInfo, Severity};
 
 #[derive(Args)]
 pub struct CheckArgs {
@@ -32,11 +32,31 @@ pub struct CheckArgs {
     pub json: bool,
 }
 
+/// clap splits on commas but keeps the surrounding spaces, so `--features "a, b"`
+/// arrives as `["a", " b"]`. Trim first, then reject what cargo could not accept, rather
+/// than letting an unusable name reach the checks.
+fn parse_features(raw: Vec<String>) -> Result<Vec<String>, String> {
+    let mut features = Vec::with_capacity(raw.len());
+    for value in raw {
+        let trimmed = value.trim();
+        if trimmed.is_empty() {
+            return Err("empty feature name: drop the stray comma".to_string());
+        }
+        if !is_valid_feature_name(trimmed) {
+            return Err(format!(
+                "invalid feature name `{trimmed}`: use letters, digits, `-` or `_`"
+            ));
+        }
+        features.push(trimmed.to_string());
+    }
+    Ok(features)
+}
+
 pub fn run(args: CheckArgs) -> Result<(), Box<dyn std::error::Error>> {
     let crate_info = CrateInfo {
         name: args.crate_name.clone(),
         version: args.version,
-        features: args.features,
+        features: parse_features(args.features)?,
         default_features: !args.no_default_features,
         is_transitive: false,
     };

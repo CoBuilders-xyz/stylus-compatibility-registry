@@ -1,5 +1,5 @@
 use crate::checks::CrateCheck;
-use crate::types::{CheckResult, CrateInfo};
+use crate::types::{is_valid_feature_name, CheckResult, CrateInfo};
 use std::fs;
 use std::io;
 use std::path::Path;
@@ -67,10 +67,7 @@ fn validate_crate_info(crate_info: &CrateInfo) -> Result<(), &'static str> {
         }
     }
     for feature in &crate_info.features {
-        if !feature
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '/')
-        {
+        if !is_valid_feature_name(feature) {
             return Err("invalid feature name");
         }
     }
