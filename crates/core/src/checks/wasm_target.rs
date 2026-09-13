@@ -182,10 +182,11 @@ fn extract_compiler_errors(output: &str) -> String {
         .join("\n");
 
     // A crate like packed_simd repeats the same few codes hundreds of times, and the
-    // whole list buries the report it is printed into.
+    // whole list buries the report it is printed into. The tally counts matching
+    // lines, cargo's own "could not compile" summary among them, so it says lines.
     if errors.len() > MAX_REPORTED_LINES {
         format!(
-            "{head}\n... and {} more errors",
+            "{head}\n... and {} more lines",
             errors.len() - MAX_REPORTED_LINES
         )
     } else {
@@ -252,14 +253,17 @@ pub fn compile_check_with_cargo(crate_info: &CrateInfo, cargo: &str) -> CompileC
     };
 
     match child.wait_timeout(CARGO_TIMEOUT) {
-        Ok(Some(status)) => classify_output(
-            &crate_info.name,
-            &Output {
-                status,
-                stdout: fs::read(&stdout_path).unwrap_or_default(),
-                stderr: fs::read(&stderr_path).unwrap_or_default(),
-            },
-        ),
+        Ok(Some(status)) => match (fs::read(&stdout_path), fs::read(&stderr_path)) {
+            (Ok(stdout), Ok(stderr)) => classify_output(
+                &crate_info.name,
+                &Output {
+                    status,
+                    stdout,
+                    stderr,
+                },
+            ),
+            _ => CompileCheckOutcome::Unavailable,
+        },
         Ok(None) => {
             let _ = child.kill();
             let _ = child.wait();
@@ -423,11 +427,11 @@ mod tests {
             .join("\n");
         let extracted = extract_compiler_errors(&output);
         assert_eq!(extracted.lines().count(), MAX_REPORTED_LINES + 1);
-        assert!(extracted.ends_with("... and 15 more errors"));
+        assert!(extracted.ends_with("... and 15 more lines"));
     }
 
     /// A pipe buffer holds about 64 KB. Output past that used to stall the child
-    /// until the timeout, which surfaced as a passing check instead of a failure.
+    /// until the timeout, which degraded to the blocklist and reported a pass.
     #[cfg(unix)]
     #[test]
     fn classifies_a_failure_that_outgrows_the_pipe_buffer() {
@@ -451,10 +455,9 @@ mod tests {
             is_transitive: false,
         };
 
-        match compile_check_with_cargo(&info, fake_cargo.to_str().unwrap()) {
-            CompileCheckOutcome::Error(errors) => assert!(errors.contains("E0557")),
-            other => panic!("a failing build should be an error, got {other:?}"),
-        }
+        let result = WasmTargetCheck.run_with_cargo(&info, fake_cargo.to_str().unwrap());
+        assert_eq!(result.severity, Severity::Error);
+        assert!(result.message.contains("E0557"));
     }
 
     #[test]
