@@ -784,6 +784,7 @@ dependencies = [
  "serde_json",
  "stylus-compat-core",
  "tabled",
+ "tempfile",
 ]
 
 [[package]]
