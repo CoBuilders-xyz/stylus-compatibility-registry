@@ -14,11 +14,15 @@ pub enum RegistryError {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct KnownCrateEntry {
     pub name: String,
     pub requires_std: bool,
     pub has_float: bool,
     pub has_async: bool,
+    /// Set when the crate only builds without std once its default features are off.
+    #[serde(default)]
+    pub requires_no_default_features: bool,
     pub max_version: Option<String>,
     pub alternative: Option<String>,
     pub notes: Option<String>,
@@ -110,6 +114,7 @@ mod tests {
             requires_std: true,
             has_float: true,
             has_async: false,
+            requires_no_default_features: false,
             max_version: None,
             alternative: None,
             notes: notes.map(str::to_string),
@@ -170,6 +175,62 @@ notes = "Uses std::io for formatting"
         let sj = registry.lookup("serde_json").unwrap();
         assert!(sj.requires_std);
         assert_eq!(sj.alternative.as_deref(), Some("serde-json-core"));
+    }
+
+    #[test]
+    fn reads_the_default_features_requirement() {
+        let mut file = NamedTempFile::new().unwrap();
+        write!(
+            file,
+            r#"
+[[crate]]
+name = "hex"
+requires_std = false
+has_float = false
+has_async = false
+requires_no_default_features = true
+
+[[crate]]
+name = "stylus-sdk"
+requires_std = false
+has_float = false
+has_async = false
+"#
+        )
+        .unwrap();
+
+        let mut registry = KnownCratesRegistry::new();
+        registry.load_file(file.path()).unwrap();
+
+        assert!(registry.lookup("hex").unwrap().requires_no_default_features);
+        assert!(
+            !registry
+                .lookup("stylus-sdk")
+                .unwrap()
+                .requires_no_default_features
+        );
+    }
+
+    #[test]
+    fn rejects_a_misspelled_field() {
+        let mut file = NamedTempFile::new().unwrap();
+        write!(
+            file,
+            r#"
+[[crate]]
+name = "hex"
+requires_std = false
+has_float = false
+has_async = false
+requires_no_default_feature = true
+"#
+        )
+        .unwrap();
+
+        let err = KnownCratesRegistry::new()
+            .load_file(file.path())
+            .unwrap_err();
+        assert!(matches!(err, RegistryError::ParseError(_)));
     }
 
     #[test]

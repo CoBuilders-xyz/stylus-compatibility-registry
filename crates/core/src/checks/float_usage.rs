@@ -518,6 +518,7 @@ mod tests {
             requires_std: false,
             has_float,
             has_async: false,
+            requires_no_default_features: false,
             max_version: None,
             alternative: None,
             notes: Some("heavily uses f32/f64".to_string()),

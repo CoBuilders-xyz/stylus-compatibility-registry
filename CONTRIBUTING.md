@@ -246,6 +246,7 @@ name = "crate-name"
 requires_std = false          # true if it needs std
 has_float = false             # true if it uses f32/f64
 has_async = false             # true if it uses async runtimes
+requires_no_default_features = false  # true if no_std needs default features off
 alternative = "other-crate"  # optional: Stylus-friendly alternative
 notes = "Brief explanation"   # optional: configuration tips
 ```
@@ -254,7 +255,7 @@ notes = "Brief explanation"   # optional: configuration tips
 
 Include evidence: a link to the crate's `Cargo.toml` showing `no_std` support, or a compilation error log if incompatible.
 
-These three flags are what the `no_std`, `float_usage` and `async_usage` checks read, and an entry
+These flags are what the `no_std`, `float_usage` and `async_usage` checks read, and an entry
 takes precedence over the blocklists and over the source scan. A wrong flag silences a real problem.
 
 ## Getting Help

@@ -42,7 +42,7 @@ flowchart TD
 ## Shared data model
 
 - `CrateInfo`: name, optional version, selected features, default-feature flag and transitive flag.
-- `KnownCrateEntry`: name, `requires_std`, `has_float`, `has_async`, optional `max_version`, alternative and notes. `max_version` and alternatives are stored but not enforced/rendered as automated advice.
+- `KnownCrateEntry`: name, `requires_std`, `has_float`, `has_async`, `requires_no_default_features`, optional `max_version`, alternative and notes. `max_version` and alternatives are stored but not enforced/rendered as automated advice.
 - `CheckResult`: `check_name`, `severity` (`Pass`, `Warning`, `Error`), message.
 - `CrateReport`: input crate information, ordered results and score.
 - `ProjectReport`: manifest path, crate reports, aggregate error/warning counts and overall score.
@@ -53,7 +53,7 @@ Serde provides JSON serialization. TOML parsing errors and filesystem errors pro
 
 | Check | Registry hit | Registry miss |
 |---|---|---|
-| `no_std` | `requires_std=true` is an error; false passes | Known std-dependent names are errors |
+| `no_std` | `requires_std=true` is an error; `requires_no_default_features=true` warns while the dependency keeps its default features on; otherwise passes | Known std-dependent names are errors |
 | `wasm_target` | Registry is not consulted | Known OS-dependent names fail immediately; otherwise attempt Cargo compilation |
 | `float_usage` | `has_float=true` warns; false passes without a scan | Known float names warn; otherwise scan downloaded Rust source if a version was supplied |
 | `async_usage` | `has_async=true` is an error; false passes | Known async runtime names are errors |
