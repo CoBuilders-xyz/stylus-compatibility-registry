@@ -75,6 +75,11 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            fixtures/allocator-advisory
       - run: cargo test --locked -p stylus-compat-core compile_check_ -- --ignored
+      - run: cargo test --locked -p stylus-compat-core --test allocator_check -- --ignored
       - run: cargo build --locked
       - run: python scripts/smoke_test.py --binary target/debug/stylus-registry

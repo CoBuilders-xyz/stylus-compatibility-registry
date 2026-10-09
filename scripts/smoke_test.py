@@ -19,8 +19,8 @@ def require_compilation(report):
     wasm = next(item for item in report["results"] if item["check_name"] == "wasm_target")
     if wasm["severity"] != "Pass" or "compiles for wasm32-unknown-unknown" not in wasm["message"]:
         raise AssertionError(f"Actual compilation was required, received {wasm}")
-    if len(report["results"]) != 5:
-        raise AssertionError("Expected all five checks")
+    if len(report["results"]) != 6:
+        raise AssertionError("Expected all six checks")
 
 
 def main():

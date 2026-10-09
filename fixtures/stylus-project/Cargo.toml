@@ -1,0 +1,15 @@
+[package]
+name = "stylus-allocator-fixture"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Registers mini-alloc as the global allocator through its default features.
+stylus-sdk = "0.10"
+
+# An allocator implementation; registering it globally may conflict with the SDK.
+wee_alloc = "0.4"
+
+# Neither is flagged by the allocator name check, so both should pass.
+tiny-keccak = "2.0"
+dlmalloc = "0.2"

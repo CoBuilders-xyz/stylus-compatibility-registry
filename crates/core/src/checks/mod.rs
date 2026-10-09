@@ -1,3 +1,4 @@
+pub mod allocator;
 pub mod async_usage;
 pub mod float_usage;
 pub mod no_std;
@@ -16,12 +17,20 @@ pub trait CrateCheck {
 ///
 /// `entry` is the crate's registry record when it has one. The no_std, float and
 /// async checks prefer it; passing `None` retains their fallback behavior.
-pub fn run_all_checks(crate_info: &CrateInfo, entry: Option<&KnownCrateEntry>) -> Vec<CheckResult> {
+///
+/// `deps` is the project's dependency tree, which the allocator check needs to see the
+/// crate's siblings. Pass `None` when a single crate name was checked and there is none.
+pub fn run_all_checks(
+    crate_info: &CrateInfo,
+    entry: Option<&KnownCrateEntry>,
+    deps: Option<&[CrateInfo]>,
+) -> Vec<CheckResult> {
     vec![
         no_std::NoStdCheck.check_against_registry(crate_info, entry),
         wasm_target::WasmTargetCheck.run(crate_info),
         float_usage::FloatUsageCheck.check_against_registry(crate_info, entry),
         async_usage::AsyncUsageCheck.check_against_registry(crate_info, entry),
         simd::SimdCheck.run(crate_info),
+        allocator::AllocatorCheck.check_in_tree(crate_info, deps),
     ]
 }

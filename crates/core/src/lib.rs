@@ -57,7 +57,7 @@ pub fn analyze_project_with_transitive(
     let mut total_warnings = 0;
 
     for dep in &deps {
-        let results = run_all_checks(dep, registry.lookup(&dep.name));
+        let results = run_all_checks(dep, registry.lookup(&dep.name), Some(&deps));
 
         let error_count = results
             .iter()
