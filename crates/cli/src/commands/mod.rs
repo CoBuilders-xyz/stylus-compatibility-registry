@@ -1,5 +1,6 @@
 pub mod check;
 pub mod check_deps;
+pub mod init;
 
 use clap::{Parser, Subcommand};
 
@@ -45,4 +46,7 @@ pub enum Commands {
 
     /// Analyze all dependencies in a Cargo.toml for Stylus compatibility
     CheckDeps(check_deps::CheckDepsArgs),
+
+    /// Generate a default .stylus-compat.toml config file
+    Init(init::InitArgs),
 }

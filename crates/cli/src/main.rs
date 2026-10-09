@@ -9,6 +9,7 @@ fn main() {
     let result = match cli.command {
         Commands::Check(args) => commands::check::run(args),
         Commands::CheckDeps(args) => commands::check_deps::run(args),
+        Commands::Init(args) => commands::init::run(args),
     };
 
     if let Err(e) = result {

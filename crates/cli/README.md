@@ -13,6 +13,14 @@ The CLI checks standard-library requirements, WASM compilation, float usage, asy
 
 The WASM compilation check still needs Rust, Cargo, the WASM target and network access. Cargo installs the executable; download the versioned registry data separately to use `--data-dir`.
 
+Run `stylus-registry init` to generate a `.stylus-compat.toml` in the current directory (or `--path <dir>`) with every setting commented out and showing its default. It will not overwrite an existing file unless you pass `--force`.
+
+```toml
+# threshold = 90        # minimum score (0-100) to pass in strict mode
+# data_dir = "data"     # registry data directory, same as --data-dir
+# format = "text"       # "text" or "json", same as --json
+```
+
 This is a beta heuristic checker, not a deployment validator. Read the result messages: some checks can fall back to a passing blocklist result when compilation or source analysis could not run.
 
 - [Installation, registry download and examples](https://github.com/CoBuilders-xyz/stylus-compatibility-registry/blob/main/docs/usage.md)
